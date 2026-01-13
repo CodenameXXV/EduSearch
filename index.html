@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduSearch — Пошук освітніх матеріалів</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #fafafa;
+      color: #222;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px 24px;
+      flex: 1;
+      position: relative;
+      padding-top: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      position: absolute;
+      top: 120px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .header.hidden {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 600;
+      color: #1e6ff0;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-container {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 14px 50px 14px 20px; /* місце для мікрофона справа всередині */
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 28px;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: #1e6ff0;
+      box-shadow: 0 0 0 2px rgba(30, 111, 240, 0.15);
+    }
+
+    .voice-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .voice-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .voice-btn.recording {
+      color: #f44336;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .google-btn {
+      background: #f8f9fa;
+      border: 1px solid #ccc;
+      border-radius: 28px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #5f6368;
+      cursor: pointer;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      min-width: 80px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .google-btn:hover {
+      background: #e8eaed;
+      border-color: #1e6ff0;
+    }
+
+    .search-wrapper.lifted {
+      transform: translateY(-140px);
+      margin-bottom: -116px;
+      position: relative;
+    }
+
+    .results-section,
+    .calculator-result {
+      margin-top: 24px;
+      width: 100%;
+      max-width: 600px;
+      transition: opacity 0.3s ease;
+    }
+
+    .video-section,
+    .result-item {
+      display: none;
+    }
+
+    .video-section.visible,
+    .result-item.visible {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .calculator-result {
+      display: none;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #1e6ff0;
+      background: #f9f9ff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .calculator-result.visible {
+      display: block;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .average-hint {
+      font-size: 16px;
+      color: #555;
+      margin-top: 8px;
+      font-weight: normal;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      margin: 16px 0 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .result-title {
+      font-size: 18px;
+      color: #1e6ff0;
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .result-title:hover {
+      text-decoration: underline;
+    }
+
+    .favicon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      border-radius: 2px;
+    }
+
+    .result-url {
+      font-size: 14px;
+      color: #0d6e3f;
+      margin-bottom: 4px;
+    }
+
+    .result-desc {
+      font-size: 14px;
+      color: #666;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #666;
+      background: #fff;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: #1e6ff0;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header" id="header">
+      <div class="logo">EduSearch</div>
+      <div class="subtitle">Пошук освітніх матеріалів за темою</div>
+    </div>
+
+    <div class="search-wrapper" id="searchWrapper">
+      <div class="input-container">
+        <input type="text" id="keywords" class="search-box" placeholder="Наприклад: past simple, climate change... або 5+3+2" autocomplete="off" />
+        <button class="voice-btn" id="voiceBtn" title="Голосове введення">🎙️</button>
+      </div>
+      <button class="google-btn" id="googleBtn">Google</button>
+    </div>
+
+    <!-- Калькулятор-результат -->
+    <div class="calculator-result" id="calculatorResult"></div>
+
+    <!-- Основні ресурси -->
+    <div class="results-section" id="main-results">
+      <div class="result-item" id="item-wordwall">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=wordwall.net" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">wordwall.net</div>
+        <div class="result-desc">Спільнота Wordwall: інтерактивні завдання</div>
+      </div>
+      <div class="result-item" id="item-liveworksheets">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=liveworksheets.com" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">liveworksheets.com</div>
+        <div class="result-desc">Інтерактивні робочі аркуші</div>
+      </div>
+      <div class="result-item" id="item-islcollective-worksheets">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">islcollective.com</div>
+        <div class="result-desc">Друковані та цифрові матеріали</div>
+      </div>
+      <div class="result-item" id="item-learningapps">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=learningapps.org" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">learningapps.org</div>
+        <div class="result-desc">Інтерактивні завдання та гри</div>
+      </div>
+      <div class="result-item" id="item-naurok-presentations">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">naurok.com.ua (презентації)</div>
+        <div class="result-desc">Презентації на «На Урок»</div>
+      </div>
+      <div class="result-item" id="item-naurok-tests">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">naurok.com.ua (тести)</div>
+        <div class="result-desc">Тести на «На Урок»</div>
+      </div>
+      <div class="result-item" id="item-vseosvita">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=vseosvita.ua" alt="">
+          <span></span>
+        </a>
+        <div class="result-url">vseosvita.ua</div>
+        <div class="result-desc">Матеріали на «Всеосвіта»</div>
+      </div>
+    </div>
+
+    <!-- Відео-секція -->
+    <div class="results-section">
+      <div class="video-section" id="video-section">
+        <div class="section-title">Відео</div>
+
+        <div class="result-item" id="item-islcollective-videos">
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
+            <span></span>
+          </a>
+          <div class="result-url">islcollective.com/video</div>
+          <div class="result-desc">Інтерактивні відеоуроки з завданнями</div>
+        </div>
+        <div class="result-item" id="item-youtube">
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=youtube.com" alt="">
+            <span></span>
+          </a>
+          <div class="result-url">youtube.com</div>
+          <div class="result-desc">Навчальні відео на YouTube</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Автор: <a href="https://codenamexxv.github.io/teacher/" target="_blank" rel="noopener">Ігор Шуляк</a><br>
+    &copy; 2026
+  </footer>
+
+  <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    const voiceBtn = document.getElementById('voiceBtn');
+    const googleBtn = document.getElementById('googleBtn');
+    const input = document.getElementById('keywords');
+    const header = document.getElementById('header');
+    const searchWrapper = document.getElementById('searchWrapper');
+    const calculatorResult = document.getElementById('calculatorResult');
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'uk-UA';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      let stopTimeout = null;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        input.value = transcript;
+        updateResults();
+        stopRecording();
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Помилка:', event.error);
+        stopRecording();
+      };
+
+      recognition.onend = () => {
+        if (stopTimeout) clearTimeout(stopTimeout);
+        stopRecording();
+      };
+    }
+
+    function startVoiceInput() {
+      if (!recognition) {
+        alert('Ваш браузер не підтримує голосове введення. Спробуйте Chrome або Edge.');
+        return;
+      }
+
+      if (voiceBtn.classList.contains('recording')) {
+        recognition.stop();
+      } else {
+        voiceBtn.textContent = '⏹';
+        voiceBtn.classList.add('recording');
+        recognition.start();
+
+        stopTimeout = setTimeout(() => {
+          recognition.stop();
+        }, 4000);
+      }
+    }
+
+    function stopRecording() {
+      voiceBtn.classList.remove('recording');
+      voiceBtn.textContent = '🎙️';
+      if (stopTimeout) clearTimeout(stopTimeout);
+    }
+
+    voiceBtn.addEventListener('click', startVoiceInput);
+
+    // === Google пошук ===
+    function searchInGoogle() {
+      const query = input.value.trim();
+      if (query) {
+        const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        // Якщо нічого не введено — відкриваємо головну Google
+        window.open('https://www.google.com', '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    googleBtn.addEventListener('click', searchInGoogle);
+
+    // === Обробка Enter ===
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const value = input.value.trim();
+        if (value && isMathExpression(value)) {
+          const result = safeEvaluate(value);
+          if (result !== null) {
+            updateResults(); // лише калькулятор
+            return;
+          }
+        }
+        searchInGoogle(); // інакше — Google
+      }
+    });
+
+    // === Решта логіки ===
+    const mainItems = {
+      wordwall: document.getElementById('item-wordwall'),
+      liveworksheets: document.getElementById('item-liveworksheets'),
+      islcollectiveWorksheets: document.getElementById('item-islcollective-worksheets'),
+      learningapps: document.getElementById('item-learningapps'),
+      naurokPresentations: document.getElementById('item-naurok-presentations'),
+      naurokTests: document.getElementById('item-naurok-tests'),
+      vseosvita: document.getElementById('item-vseosvita')
+    };
+    const videoItems = {
+      islcollectiveVideos: document.getElementById('item-islcollective-videos'),
+      youtube: document.getElementById('item-youtube')
+    };
+    const videoSection = document.getElementById('video-section');
+
+    function isOnlyAddition(expr) {
+      const clean = expr.trim().replace(/\s+/g, '');
+      if (!clean.includes('+')) return false;
+      if (/[-*/()]/.test(clean)) return false;
+      const parts = clean.split('+');
+      return parts.every(part => part !== '' && !isNaN(parseFloat(part)) && isFinite(parseFloat(part)));
+    }
+
+    function extractNumbersFromAddition(expr) {
+      const clean = expr.trim().replace(/\s+/g, '');
+      return clean.split('+').map(s => parseFloat(s));
+    }
+
+    function isMathExpression(str) {
+      const trimmed = str.trim();
+      if (!trimmed) return false;
+      if (!/\d/.test(trimmed)) return false;
+      if (!/^[\d\s+\-*/().]+$/.test(trimmed)) return false;
+      if (/^[*/+]|\+$|[\-*/+)]$/.test(trimmed)) return false;
+      if (/[\-+*/]{2,}/.test(trimmed.replace(/\(\s*-/g, ''))) return false;
+      return true;
+    }
+
+    function safeEvaluate(expr) {
+      try {
+        const result = new Function('return (' + expr + ')')();
+        if (typeof result === 'number' && isFinite(result)) {
+          return result;
+        }
+      } catch (e) {
+        return null;
+      }
+      return null;
+    }
+
+    function toPlusFormat(str) {
+      return str.replace(/\s+/g, '+');
+    }
+
+    function toSlugFormat(str) {
+      return str.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+    }
+
+    function updateResults() {
+      const value = input.value.trim();
+      if (!value) {
+        header.classList.remove('hidden');
+        searchWrapper.classList.remove('lifted');
+        calculatorResult.classList.remove('visible');
+        for (const item of Object.values(mainItems)) item.classList.remove('visible');
+        for (const item of Object.values(videoItems)) item.classList.remove('visible');
+        videoSection.classList.remove('visible');
+        return;
+      }
+
+      if (isMathExpression(value)) {
+        const result = safeEvaluate(value);
+        if (result !== null) {
+          header.classList.add('hidden');
+          searchWrapper.classList.add('lifted');
+
+          let displayText = `${value} = ${result}`;
+          let averageLine = '';
+
+          if (isOnlyAddition(value)) {
+            const numbers = extractNumbersFromAddition(value);
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            const avgRounded = avg % 1 === 0 ? avg : parseFloat(avg.toFixed(2));
+            averageLine = `<div class="average-hint">Середнє: ${avgRounded}</div>`;
+          }
+
+          calculatorResult.innerHTML = displayText + averageLine;
+          calculatorResult.classList.add('visible');
+
+          for (const item of Object.values(mainItems)) item.classList.remove('visible');
+          for (const item of Object.values(videoItems)) item.classList.remove('visible');
+          videoSection.classList.remove('visible');
+          return;
+        }
+      }
+
+      // Звичайний пошук
+      header.classList.add('hidden');
+      searchWrapper.classList.add('lifted');
+      calculatorResult.classList.remove('visible');
+
+      const encodedForGoogle = encodeURIComponent(value);
+      const plusFormat = toPlusFormat(value);
+      const slugFormat = toSlugFormat(value);
+
+      mainItems.wordwall.querySelector('.result-title span').textContent = `"${value}" на Wordwall`;
+      mainItems.wordwall.querySelector('.result-title').href = `https://wordwall.net/uk-ua/community/${slugFormat}`;
+
+      mainItems.liveworksheets.querySelector('.result-title span').textContent = `"${value}" на Liveworksheets`;
+      mainItems.liveworksheets.querySelector('.result-title').href = `https://www.liveworksheets.com/search-worksheets?keys=${encodedForGoogle}`;
+
+      mainItems.islcollectiveWorksheets.querySelector('.result-title span').textContent = `"${value}" на ISL Collective`;
+      mainItems.islcollectiveWorksheets.querySelector('.result-title').href = `https://en.islcollective.com/english-esl-worksheets/search/${plusFormat}`;
+
+      mainItems.learningapps.querySelector('.result-title span').textContent = `"${value}" на LearningApps`;
+      mainItems.learningapps.querySelector('.result-title').href = `https://learningapps.org/index.php?s=${encodedForGoogle}`;
+
+      mainItems.naurokPresentations.querySelector('.result-title span').textContent = `"${value}" — презентації на «На Урок»`;
+      mainItems.naurokPresentations.querySelector('.result-title').href = `https://naurok.com.ua/biblioteka/typ-17?q=${encodedForGoogle}`;
+
+      mainItems.naurokTests.querySelector('.result-title span').textContent = `"${value}" — тести на «На Урок»`;
+      mainItems.naurokTests.querySelector('.result-title').href = `https://naurok.com.ua/test?q=${encodedForGoogle}`;
+
+      mainItems.vseosvita.querySelector('.result-title span').textContent = `"${value}" на «Всеосвіта»`;
+      mainItems.vseosvita.querySelector('.result-title').href = `https://vseosvita.ua/library?s=${encodedForGoogle}&cat=&is_pay=0&is_ai=&status_show=&order=3&page=&quest_type=&type_control=&id_folder=&class=&type=&title_only=`;
+
+      videoItems.islcollectiveVideos.querySelector('.result-title span').textContent = `"${value}" інтерактивні відео на ISL`;
+      videoItems.islcollectiveVideos.querySelector('.result-title').href = `https://en.islcollective.com/english-esl-video-lessons/search/${plusFormat}`;
+
+      videoItems.youtube.querySelector('.result-title span').textContent = `"${value}" на YouTube`;
+      videoItems.youtube.querySelector('.result-title').href = `https://www.youtube.com/results?search_query=${plusFormat}`;
+
+      for (const item of Object.values(mainItems)) item.classList.add('visible');
+      for (const item of Object.values(videoItems)) item.classList.add('visible');
+      videoSection.classList.add('visible');
+    }
+
+    input.addEventListener('input', updateResults);
+  </script>
+</body>
+</html>
