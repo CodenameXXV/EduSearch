@@ -84,7 +84,7 @@
 
     .search-box {
       width: 100%;
-      padding: 14px 50px 14px 20px; /* місце для мікрофона справа всередині */
+      padding: 14px 50px 14px 20px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 28px;
@@ -152,6 +152,78 @@
       transform: translateY(-140px);
       margin-bottom: -116px;
       position: relative;
+    }
+
+    /* Недавні теми — плавна поява/зникнення */
+    .recent-section,
+    .favorites-section {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 8px;
+      overflow: hidden;
+      opacity: 0;
+      max-height: 0;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    .recent-section.visible,
+    .favorites-section.visible {
+      opacity: 1;
+      max-height: 200px;
+    }
+
+    .recent-title,
+    .favorites-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      margin: 16px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .recent-list,
+    .favorites-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .recent-item,
+    .favorite-item {
+      background: #eef4ff;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      color: #1e6ff0;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+      padding-right: 24px;
+    }
+
+    .recent-item:hover,
+    .favorite-item:hover {
+      background: #dceaff;
+    }
+
+    /* Кнопки видалення */
+    .delete-recent,
+    .delete-fav {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #999;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .recent-item:hover .delete-recent,
+    .favorite-item:hover .delete-fav {
+      opacity: 1;
     }
 
     .results-section,
@@ -228,6 +300,7 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 4px;
+      position: relative;
     }
 
     .result-title:hover {
@@ -250,6 +323,44 @@
     .result-desc {
       font-size: 14px;
       color: #666;
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      white-space: nowrap;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .tooltip.visible {
+      opacity: 1;
+    }
+
+    /* Favorite star */
+    .favorite-star {
+      position: absolute;
+      right: -24px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .favorite-star.filled {
+      color: #f4c20d;
     }
 
     footer {
@@ -287,66 +398,126 @@
       <button class="google-btn" id="googleBtn">Google</button>
     </div>
 
+    <!-- Недавні теми -->
+    <div class="recent-section" id="recent-section">
+      <div class="recent-title">Недавні теми</div>
+      <div class="recent-list" id="recent-list"></div>
+    </div>
+
+    <!-- Улюблене -->
+    <div class="favorites-section" id="favorites-section">
+      <div class="favorites-title">Улюблене</div>
+      <div class="favorites-list" id="favorites-list"></div>
+    </div>
+
     <!-- Калькулятор-результат -->
     <div class="calculator-result" id="calculatorResult"></div>
 
-    <!-- Основні ресурси -->
+    <!-- Основні ресурси (без CommonLit, Newsela, Edpuzzle, Canva) -->
     <div class="results-section" id="main-results">
       <div class="result-item" id="item-wordwall">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=wordwall.net" alt="">
           <span></span>
+          <div class="tooltip">Wordwall — створюйте ігри за 2 хвилини</div>
         </a>
         <div class="result-url">wordwall.net</div>
         <div class="result-desc">Спільнота Wordwall: інтерактивні завдання</div>
+        <span class="favorite-star" data-id="wordwall">☆</span>
       </div>
       <div class="result-item" id="item-liveworksheets">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=liveworksheets.com" alt="">
           <span></span>
+          <div class="tooltip">Liveworksheets — інтерактивні робочі аркуші</div>
         </a>
         <div class="result-url">liveworksheets.com</div>
         <div class="result-desc">Інтерактивні робочі аркуші</div>
+        <span class="favorite-star" data-id="liveworksheets">☆</span>
       </div>
       <div class="result-item" id="item-islcollective-worksheets">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
           <span></span>
+          <div class="tooltip">ISL Collective — друковані та цифрові матеріали</div>
         </a>
         <div class="result-url">islcollective.com</div>
         <div class="result-desc">Друковані та цифрові матеріали</div>
+        <span class="favorite-star" data-id="islcollectiveWorksheets">☆</span>
       </div>
       <div class="result-item" id="item-learningapps">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=learningapps.org" alt="">
           <span></span>
+          <div class="tooltip">LearningApps — інтерактивні завдання та гри</div>
         </a>
         <div class="result-url">learningapps.org</div>
         <div class="result-desc">Інтерактивні завдання та гри</div>
+        <span class="favorite-star" data-id="learningapps">☆</span>
       </div>
       <div class="result-item" id="item-naurok-presentations">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
           <span></span>
+          <div class="tooltip">На Урок — презентації</div>
         </a>
         <div class="result-url">naurok.com.ua (презентації)</div>
         <div class="result-desc">Презентації на «На Урок»</div>
+        <span class="favorite-star" data-id="naurokPresentations">☆</span>
       </div>
       <div class="result-item" id="item-naurok-tests">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
           <span></span>
+          <div class="tooltip">На Урок — тести</div>
         </a>
         <div class="result-url">naurok.com.ua (тести)</div>
         <div class="result-desc">Тести на «На Урок»</div>
+        <span class="favorite-star" data-id="naurokTests">☆</span>
       </div>
       <div class="result-item" id="item-vseosvita">
         <a href="#" class="result-title" target="_blank" rel="noopener">
           <img class="favicon" src="https://www.google.com/s2/favicons?domain=vseosvita.ua" alt="">
           <span></span>
+          <div class="tooltip">Всеосвіта — методичні матеріали</div>
         </a>
         <div class="result-url">vseosvita.ua</div>
         <div class="result-desc">Матеріали на «Всеосвіта»</div>
+        <span class="favorite-star" data-id="vseosvita">☆</span>
+      </div>
+
+      <!-- Kahoot + Quizlet -->
+      <div class="result-item" id="item-kahoot">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=kahoot.com" alt="">
+          <span></span>
+          <div class="tooltip">Kahoot! — інтерактивні вікторини</div>
+        </a>
+        <div class="result-url">kahoot.com</div>
+        <div class="result-desc">Інтерактивні вікторини для класу</div>
+        <span class="favorite-star" data-id="kahoot">☆</span>
+      </div>
+      <div class="result-item" id="item-quizlet">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=quizlet.com" alt="">
+          <span></span>
+          <div class="tooltip">Quizlet — картки, вивчення слів</div>
+        </a>
+        <div class="result-url">quizlet.com</div>
+        <div class="result-desc">Картки, вправи, тестування</div>
+        <span class="favorite-star" data-id="quizlet">☆</span>
+      </div>
+
+      <!-- ClassTools -->
+      <div class="result-item" id="item-classtools">
+        <a href="#" class="result-title" target="_blank" rel="noopener">
+          <img class="favicon" src="https://www.google.com/s2/favicons?domain=classtools.net" alt="">
+          <span></span>
+          <div class="tooltip">ClassTools.net — генератори ігор (Arcade, Timeline тощо)</div>
+        </a>
+        <div class="result-url">classtools.net</div>
+        <div class="result-desc">Генератори ігор, діаграм, таймлайнів</div>
+        <span class="favorite-star" data-id="classtools">☆</span>
       </div>
     </div>
 
@@ -359,17 +530,21 @@
           <a href="#" class="result-title" target="_blank" rel="noopener">
             <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
             <span></span>
+            <div class="tooltip">ISL Collective Videos — інтерактивні відеоуроки</div>
           </a>
           <div class="result-url">islcollective.com/video</div>
           <div class="result-desc">Інтерактивні відеоуроки з завданнями</div>
+          <span class="favorite-star" data-id="islcollectiveVideos">☆</span>
         </div>
         <div class="result-item" id="item-youtube">
           <a href="#" class="result-title" target="_blank" rel="noopener">
             <img class="favicon" src="https://www.google.com/s2/favicons?domain=youtube.com" alt="">
             <span></span>
+            <div class="tooltip">YouTube — навчальні відео</div>
           </a>
           <div class="result-url">youtube.com</div>
           <div class="result-desc">Навчальні відео на YouTube</div>
+          <span class="favorite-star" data-id="youtube">☆</span>
         </div>
       </div>
     </div>
@@ -381,6 +556,20 @@
   </footer>
 
   <script>
+    // === Debounce utility ===
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // === DOM Elements ===
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     const voiceBtn = document.getElementById('voiceBtn');
@@ -389,7 +578,82 @@
     const header = document.getElementById('header');
     const searchWrapper = document.getElementById('searchWrapper');
     const calculatorResult = document.getElementById('calculatorResult');
+    const recentSection = document.getElementById('recent-section');
+    const recentList = document.getElementById('recent-list');
+    const favoritesSection = document.getElementById('favorites-section');
+    const favoritesList = document.getElementById('favorites-list');
 
+    // === Platform items (без CommonLit, Newsela, Edpuzzle, Canva) ===
+    const mainItems = {
+      wordwall: document.getElementById('item-wordwall'),
+      liveworksheets: document.getElementById('item-liveworksheets'),
+      islcollectiveWorksheets: document.getElementById('item-islcollective-worksheets'),
+      learningapps: document.getElementById('item-learningapps'),
+      naurokPresentations: document.getElementById('item-naurok-presentations'),
+      naurokTests: document.getElementById('item-naurok-tests'),
+      vseosvita: document.getElementById('item-vseosvita'),
+      kahoot: document.getElementById('item-kahoot'),
+      quizlet: document.getElementById('item-quizlet'),
+      classtools: document.getElementById('item-classtools')
+    };
+
+    const videoItems = {
+      islcollectiveVideos: document.getElementById('item-islcollective-videos'),
+      youtube: document.getElementById('item-youtube')
+    };
+
+    const videoSection = document.getElementById('video-section');
+
+    // === Helper: build URL for platform ===
+    function buildPlatformUrl(platformId, query) {
+      const encodedForGoogle = encodeURIComponent(query);
+      const plusFormat = query.replace(/\s+/g, '+');
+
+      switch (platformId) {
+        case 'classtools':
+          return 'https://www.classtools.net/_SEARCH/index.php';
+
+        case 'kahoot':
+          return `https://kahoot.com/search/?t=${plusFormat}&post_type=`;
+
+        case 'quizlet':
+          const spaceEncoded = query.replace(/\s+/g, '%20');
+          return `https://quizlet.com/search?query=${spaceEncoded}`;
+
+        case 'wordwall':
+          const slugFormat = query.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+          return `https://wordwall.net/uk-ua/community/${slugFormat}`;
+
+        case 'liveworksheets':
+          return `https://www.liveworksheets.com/search-worksheets?keys=${encodedForGoogle}`;
+
+        case 'islcollectiveWorksheets':
+          return `https://en.islcollective.com/english-esl-worksheets/search/${plusFormat}`;
+
+        case 'learningapps':
+          return `https://learningapps.org/index.php?s=${encodedForGoogle}`;
+
+        case 'naurokPresentations':
+          return `https://naurok.com.ua/biblioteka/typ-17?q=${encodedForGoogle}`;
+
+        case 'naurokTests':
+          return `https://naurok.com.ua/test?q=${encodedForGoogle}`;
+
+        case 'vseosvita':
+          return `https://vseosvita.ua/library?s=${encodedForGoogle}&cat=&is_pay=0&is_ai=&status_show=&order=3&page=&quest_type=&type_control=&id_folder=&class=&type=&title_only=`;
+
+        case 'islcollectiveVideos':
+          return `https://en.islcollective.com/english-esl-video-lessons/search/${plusFormat}`;
+
+        case 'youtube':
+          return `https://www.youtube.com/results?search_query=${plusFormat}`;
+
+        default:
+          return '#';
+      }
+    }
+
+    // === Voice Recognition ===
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
       recognition.lang = 'uk-UA';
@@ -402,8 +666,9 @@
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         input.value = transcript;
-        updateResults();
-        stopRecording();
+        debouncedUpdate();
+        saveRecentQuery(transcript);
+        updateVoiceButton();
       };
 
       recognition.onerror = (event) => {
@@ -442,23 +707,42 @@
       if (stopTimeout) clearTimeout(stopTimeout);
     }
 
-    voiceBtn.addEventListener('click', startVoiceInput);
+    // === Нова функція: перемикання між мікрофоном і ❌ ===
+    function updateVoiceButton() {
+      const isEmpty = input.value.trim() === '';
+      if (isEmpty) {
+        voiceBtn.textContent = '🎙️';
+        voiceBtn.title = 'Голосове введення';
+        voiceBtn.onclick = startVoiceInput;
+      } else {
+        voiceBtn.textContent = '❌';
+        voiceBtn.title = 'Очистити поле';
+        voiceBtn.onclick = () => {
+          input.value = '';
+          updateVoiceButton();
+          updateResultsNow(); // сховати результати
+          input.focus();
+        };
+      }
+      if (voiceBtn.classList.contains('recording')) {
+        stopRecording();
+      }
+    }
 
-    // === Google пошук ===
+    // === Google Search ===
     function searchInGoogle() {
       const query = input.value.trim();
       if (query) {
         const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
         window.open(url, '_blank', 'noopener,noreferrer');
       } else {
-        // Якщо нічого не введено — відкриваємо головну Google
         window.open('https://www.google.com', '_blank', 'noopener,noreferrer');
       }
     }
 
     googleBtn.addEventListener('click', searchInGoogle);
 
-    // === Обробка Enter ===
+    // === Enter Key Handling ===
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -466,30 +750,38 @@
         if (value && isMathExpression(value)) {
           const result = safeEvaluate(value);
           if (result !== null) {
-            updateResults(); // лише калькулятор
+            updateResultsNow();
             return;
           }
         }
-        searchInGoogle(); // інакше — Google
+        searchInGoogle();
       }
     });
 
-    // === Решта логіки ===
-    const mainItems = {
-      wordwall: document.getElementById('item-wordwall'),
-      liveworksheets: document.getElementById('item-liveworksheets'),
-      islcollectiveWorksheets: document.getElementById('item-islcollective-worksheets'),
-      learningapps: document.getElementById('item-learningapps'),
-      naurokPresentations: document.getElementById('item-naurok-presentations'),
-      naurokTests: document.getElementById('item-naurok-tests'),
-      vseosvita: document.getElementById('item-vseosvita')
-    };
-    const videoItems = {
-      islcollectiveVideos: document.getElementById('item-islcollective-videos'),
-      youtube: document.getElementById('item-youtube')
-    };
-    const videoSection = document.getElementById('video-section');
+    // === Show/hide Recent on focus/blur ===
+    input.addEventListener('focus', () => {
+      if (JSON.parse(localStorage.getItem('eduSearchRecents') || '[]').length > 0) {
+        recentSection.classList.add('visible');
+      }
+      updateVoiceButton();
+    });
 
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (!recentList.contains(document.activeElement)) {
+          recentSection.classList.remove('visible');
+        }
+      }, 200);
+      updateVoiceButton();
+    });
+
+    // === Input handling ===
+    input.addEventListener('input', () => {
+      updateVoiceButton();
+      debouncedUpdate();
+    });
+
+    // === Math Functions ===
     function isOnlyAddition(expr) {
       const clean = expr.trim().replace(/\s+/g, '');
       if (!clean.includes('+')) return false;
@@ -525,15 +817,148 @@
       return null;
     }
 
-    function toPlusFormat(str) {
-      return str.replace(/\s+/g, '+');
+    // === Tooltip Logic ===
+    document.querySelectorAll('.result-title').forEach(link => {
+      const tooltip = link.querySelector('.tooltip');
+      link.addEventListener('mouseenter', () => {
+        tooltip.classList.add('visible');
+      });
+      link.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+    });
+
+    // === Favorites ===
+    function loadFavorites() {
+      const favs = JSON.parse(localStorage.getItem('eduSearchFavorites') || '[]');
+      renderFavorites(favs);
     }
 
-    function toSlugFormat(str) {
-      return str.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+    function saveFavorite(platformId, query) {
+      let favs = JSON.parse(localStorage.getItem('eduSearchFavorites') || '[]');
+      const existingIndex = favs.findIndex(f => f.platform === platformId && f.query === query);
+      if (existingIndex === -1) {
+        favs.push({ platform: platformId, query, timestamp: Date.now() });
+        if (favs.length > 20) favs.shift();
+      }
+      localStorage.setItem('eduSearchFavorites', JSON.stringify(favs));
+      renderFavorites(favs);
+      saveRecentQuery(query);
     }
 
-    function updateResults() {
+    function removeFavorite(index) {
+      let favs = JSON.parse(localStorage.getItem('eduSearchFavorites') || '[]');
+      favs.splice(index, 1);
+      localStorage.setItem('eduSearchFavorites', JSON.stringify(favs));
+      renderFavorites(favs);
+    }
+
+    function renderFavorites(favs) {
+      favoritesList.innerHTML = '';
+      if (favs.length === 0) {
+        favoritesSection.classList.remove('visible');
+        return;
+      }
+      favoritesSection.classList.add('visible');
+      const visibleFavs = favs.slice(-10).reverse();
+      visibleFavs.forEach((fav, idx) => {
+        const realIdx = favs.length - 1 - idx;
+        const el = document.createElement('div');
+        el.className = 'favorite-item';
+        el.innerHTML = `
+          ${fav.query} → ${fav.platform}
+          <span class="delete-fav" data-index="${realIdx}">🗙</span>
+        `;
+        el.title = `Click to go to "${fav.query}" on ${fav.platform}`;
+        el.addEventListener('click', (e) => {
+          if (e.target.classList.contains('delete-fav')) return;
+          const url = buildPlatformUrl(fav.platform, fav.query);
+          if (url !== '#') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+            saveRecentQuery(fav.query);
+          }
+        });
+        favoritesList.appendChild(el);
+      });
+
+      document.querySelectorAll('.delete-fav').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.index, 10);
+          removeFavorite(idx);
+        });
+      });
+    }
+
+    // Attach favorite stars
+    document.querySelectorAll('.favorite-star').forEach(star => {
+      star.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const platformId = star.dataset.id;
+        const query = input.value.trim();
+        if (!query) return;
+        star.classList.toggle('filled');
+        if (star.classList.contains('filled')) {
+          saveFavorite(platformId, query);
+        }
+      });
+    });
+
+    // === Recent Queries ===
+    function saveRecentQuery(query) {
+      if (!query) return;
+      let recents = JSON.parse(localStorage.getItem('eduSearchRecents') || '[]');
+      recents = recents.filter(q => q !== query);
+      recents.unshift(query);
+      if (recents.length > 10) recents.pop();
+      localStorage.setItem('eduSearchRecents', JSON.stringify(recents));
+      renderRecents(recents);
+    }
+
+    function removeRecentQuery(index) {
+      let recents = JSON.parse(localStorage.getItem('eduSearchRecents') || '[]');
+      recents.splice(index, 1);
+      localStorage.setItem('eduSearchRecents', JSON.stringify(recents));
+      renderRecents(recents);
+      recentSection.classList.toggle('visible', recents.length > 0);
+    }
+
+    function renderRecents(recents) {
+      recentList.innerHTML = '';
+      if (recents.length === 0) {
+        recentSection.classList.remove('visible');
+        return;
+      }
+      recents.forEach((q, idx) => {
+        const el = document.createElement('div');
+        el.className = 'recent-item';
+        el.innerHTML = `${q}<span class="delete-recent" data-index="${idx}">🗙</span>`;
+        el.onclick = (e) => {
+          if (e.target.classList.contains('delete-recent')) return;
+          input.value = q;
+          debouncedUpdate();
+          input.focus();
+          updateVoiceButton();
+        };
+        recentList.appendChild(el);
+      });
+
+      document.querySelectorAll('.delete-recent').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.index, 10);
+          removeRecentQuery(idx);
+        });
+      });
+    }
+
+    function loadRecents() {
+      const recents = JSON.parse(localStorage.getItem('eduSearchRecents') || '[]');
+      renderRecents(recents);
+    }
+
+    // === Main Update Function ===
+    function updateResultsNow() {
       const value = input.value.trim();
       if (!value) {
         header.classList.remove('hidden');
@@ -577,43 +1002,57 @@
       searchWrapper.classList.add('lifted');
       calculatorResult.classList.remove('visible');
 
-      const encodedForGoogle = encodeURIComponent(value);
-      const plusFormat = toPlusFormat(value);
-      const slugFormat = toSlugFormat(value);
+      const platforms = [
+        { id: 'wordwall', elem: mainItems.wordwall },
+        { id: 'liveworksheets', elem: mainItems.liveworksheets },
+        { id: 'islcollectiveWorksheets', elem: mainItems.islcollectiveWorksheets },
+        { id: 'learningapps', elem: mainItems.learningapps },
+        { id: 'naurokPresentations', elem: mainItems.naurokPresentations },
+        { id: 'naurokTests', elem: mainItems.naurokTests },
+        { id: 'vseosvita', elem: mainItems.vseosvita },
+        { id: 'kahoot', elem: mainItems.kahoot },
+        { id: 'quizlet', elem: mainItems.quizlet },
+        { id: 'classtools', elem: mainItems.classtools },
+        { id: 'islcollectiveVideos', elem: videoItems.islcollectiveVideos },
+        { id: 'youtube', elem: videoItems.youtube }
+      ];
 
-      mainItems.wordwall.querySelector('.result-title span').textContent = `"${value}" на Wordwall`;
-      mainItems.wordwall.querySelector('.result-title').href = `https://wordwall.net/uk-ua/community/${slugFormat}`;
+      platforms.forEach(({ id, elem }) => {
+        const span = elem.querySelector('.result-title span');
+        const link = elem.querySelector('.result-title');
+        const url = buildPlatformUrl(id, value);
+        let titleText = `"${value}"`;
 
-      mainItems.liveworksheets.querySelector('.result-title span').textContent = `"${value}" на Liveworksheets`;
-      mainItems.liveworksheets.querySelector('.result-title').href = `https://www.liveworksheets.com/search-worksheets?keys=${encodedForGoogle}`;
+        if (id === 'naurokPresentations') titleText += ' — презентації на «На Урок»';
+        else if (id === 'naurokTests') titleText += ' — тести на «На Урок»';
+        else if (id === 'islcollectiveVideos') titleText += ' інтерактивні відео на ISL';
+        else if (id === 'youtube') titleText += ' на YouTube';
+        else if (id === 'classtools') titleText += ' на ClassTools.net';
+        else if (id === 'kahoot') titleText += ' на Kahoot!';
+        else if (id === 'quizlet') titleText += ' на Quizlet';
+        else titleText += ` на ${id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1').trim()}`;
 
-      mainItems.islcollectiveWorksheets.querySelector('.result-title span').textContent = `"${value}" на ISL Collective`;
-      mainItems.islcollectiveWorksheets.querySelector('.result-title').href = `https://en.islcollective.com/english-esl-worksheets/search/${plusFormat}`;
+        span.textContent = titleText;
+        link.href = url;
 
-      mainItems.learningapps.querySelector('.result-title span').textContent = `"${value}" на LearningApps`;
-      mainItems.learningapps.querySelector('.result-title').href = `https://learningapps.org/index.php?s=${encodedForGoogle}`;
-
-      mainItems.naurokPresentations.querySelector('.result-title span').textContent = `"${value}" — презентації на «На Урок»`;
-      mainItems.naurokPresentations.querySelector('.result-title').href = `https://naurok.com.ua/biblioteka/typ-17?q=${encodedForGoogle}`;
-
-      mainItems.naurokTests.querySelector('.result-title span').textContent = `"${value}" — тести на «На Урок»`;
-      mainItems.naurokTests.querySelector('.result-title').href = `https://naurok.com.ua/test?q=${encodedForGoogle}`;
-
-      mainItems.vseosvita.querySelector('.result-title span').textContent = `"${value}" на «Всеосвіта»`;
-      mainItems.vseosvita.querySelector('.result-title').href = `https://vseosvita.ua/library?s=${encodedForGoogle}&cat=&is_pay=0&is_ai=&status_show=&order=3&page=&quest_type=&type_control=&id_folder=&class=&type=&title_only=`;
-
-      videoItems.islcollectiveVideos.querySelector('.result-title span').textContent = `"${value}" інтерактивні відео на ISL`;
-      videoItems.islcollectiveVideos.querySelector('.result-title').href = `https://en.islcollective.com/english-esl-video-lessons/search/${plusFormat}`;
-
-      videoItems.youtube.querySelector('.result-title span').textContent = `"${value}" на YouTube`;
-      videoItems.youtube.querySelector('.result-title').href = `https://www.youtube.com/results?search_query=${plusFormat}`;
+        link.onclick = (e) => {
+          e.preventDefault();
+          window.open(url, '_blank', 'noopener,noreferrer');
+          saveRecentQuery(value);
+        };
+      });
 
       for (const item of Object.values(mainItems)) item.classList.add('visible');
       for (const item of Object.values(videoItems)) item.classList.add('visible');
       videoSection.classList.add('visible');
     }
 
-    input.addEventListener('input', updateResults);
+    const debouncedUpdate = debounce(updateResultsNow, 600);
+
+    // Initialize
+    loadRecents();
+    loadFavorites();
+    updateVoiceButton();
   </script>
 </body>
 </html>
