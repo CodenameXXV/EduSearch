@@ -413,7 +413,7 @@
     <!-- Калькулятор-результат -->
     <div class="calculator-result" id="calculatorResult"></div>
 
-    <!-- Основні ресурси (без CommonLit, Newsela, Edpuzzle, Canva) -->
+    <!-- Основні ресурси -->
     <div class="results-section" id="main-results">
       <div class="result-item" id="item-wordwall">
         <a href="#" class="result-title" target="_blank" rel="noopener">
@@ -583,7 +583,7 @@
     const favoritesSection = document.getElementById('favorites-section');
     const favoritesList = document.getElementById('favorites-list');
 
-    // === Platform items (без CommonLit, Newsela, Edpuzzle, Canva) ===
+    // === Platform items ===
     const mainItems = {
       wordwall: document.getElementById('item-wordwall'),
       liveworksheets: document.getElementById('item-liveworksheets'),
@@ -621,8 +621,9 @@
           return `https://quizlet.com/search?query=${spaceEncoded}`;
 
         case 'wordwall':
-          const slugFormat = query.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
-          return `https://wordwall.net/uk-ua/community/${slugFormat}`;
+          // ✅ Правильне формування slug з кирилицею
+          const slug = query.trim().replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+          return `https://wordwall.net/uk-ua/community/${slug}`;
 
         case 'liveworksheets':
           return `https://www.liveworksheets.com/search-worksheets?keys=${encodedForGoogle}`;
@@ -707,7 +708,7 @@
       if (stopTimeout) clearTimeout(stopTimeout);
     }
 
-    // === Нова функція: перемикання між мікрофоном і ❌ ===
+    // === Мікрофон / ❌ кнопка ===
     function updateVoiceButton() {
       const isEmpty = input.value.trim() === '';
       if (isEmpty) {
@@ -720,7 +721,7 @@
         voiceBtn.onclick = () => {
           input.value = '';
           updateVoiceButton();
-          updateResultsNow(); // сховати результати
+          updateResultsNow();
           input.focus();
         };
       }
