@@ -1,14 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Educational Search — зручний пошук освітніх матеріалів для вчителів: ігри, аркуші, відео, тести, презентації на провідних платформах."/>
   <title>Educational Search — Пошук освітніх матеріалів</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/CodenameXXV/EduSearch/refs/heads/main/search.png">
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg: #fafafa;
+      --bg-card: #fff;
+      --bg-section: #f9f9ff;
+      --text: #222;
+      --text-muted: #666;
+      --text-label: #555;
+      --border: #ccc;
+      --accent: #1e6ff0;
+      --accent-light: #eef4ff;
+      --accent-hover: #dceaff;
+      --green: #0d6e3f;
+      --shadow: rgba(0,0,0,0.05);
+      --footer-bg: #fff;
+      --footer-border: #eee;
+      --filter-bg: transparent;
+      --filter-active-bg: transparent;
+      --filter-active-text: var(--accent);
+      --result-bg: transparent;
+      --calc-bg: #f9f9ff;
+      --tag-bg: #eef4ff;
+      --tag-text: #1e6ff0;
+      --toast-bg: #222;
+      --toast-text: #fff;
     }
+
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --bg-card: #1a1d27;
+      --bg-section: #1e2130;
+      --text: #e8eaf0;
+      --text-muted: #8a8fa8;
+      --text-label: #a0a5bc;
+      --border: #2e3248;
+      --accent: #4f8ef7;
+      --accent-light: #1a2340;
+      --accent-hover: #1f2d4d;
+      --green: #34c77b;
+      --shadow: rgba(0,0,0,0.3);
+      --footer-bg: #1a1d27;
+      --footer-border: #2e3248;
+      --filter-bg: transparent;
+      --filter-active-bg: transparent;
+      --filter-active-text: var(--accent);
+      --result-bg: transparent;
+      --calc-bg: #1e2130;
+      --tag-bg: #1a2340;
+      --tag-text: #4f8ef7;
+      --toast-bg: #e8eaf0;
+      --toast-text: #0f1117;
+    }
+
+    * { box-sizing: border-box; }
 
     html, body {
       height: 100%;
@@ -18,14 +69,37 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #fafafa;
-      color: #222;
+      background-color: var(--bg);
+      color: var(--text);
       line-height: 1.5;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
 
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      z-index: 100;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .theme-toggle:hover { transform: scale(1.1); }
+
+    /* ── Container ── */
     .container {
       width: 100%;
       max-width: 1000px;
@@ -39,6 +113,7 @@
       align-items: center;
     }
 
+    /* ── Header ── */
     .header {
       position: absolute;
       top: 120px;
@@ -50,7 +125,6 @@
       transition: opacity 0.3s ease, transform 0.3s ease;
       pointer-events: auto;
     }
-
     .header.hidden {
       opacity: 0;
       transform: translateY(-20px);
@@ -60,44 +134,26 @@
     .logo {
       font-size: 32px;
       font-weight: 600;
-      color: #1e6ff0;
+      color: var(--accent);
       margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
-    
-    .logo {
-  font-size: 32px;
-  font-weight: 600;
-  color: #1e6ff0;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
     .logo-icon {
       width: 36px;
       height: 36px;
       flex-shrink: 0;
       object-fit: contain;
-      vertical-align: middle;
       transition: transform 0.2s ease;
     }
-    
-    .logo:hover .logo-icon {
-  transform: scale(1.15);
-}
+    .logo:hover .logo-icon { transform: scale(1.15); }
+    .logo-text { display: inline-block; }
 
-    .logo-text {
-      display: inline-block;
-      vertical-align: middle;
-    }
+    .subtitle { font-size: 16px; color: var(--text-muted); }
 
-    .subtitle {
-      font-size: 16px;
-      color: #666;
-    }
-
+    /* ── Search wrapper ── */
     .search-wrapper {
       position: relative;
       margin-bottom: 24px;
@@ -105,6 +161,17 @@
       max-width: 600px;
       display: flex;
       gap: 8px;
+      transition: transform 0.3s ease, margin-bottom 0.3s ease;
+    }
+    .search-wrapper.lifted {
+      transform: translateY(-140px);
+      margin-bottom: -116px;
+    }
+    @media (max-width: 600px) {
+      .search-wrapper.lifted {
+        transform: translateY(-100px);
+        margin-bottom: -76px;
+      }
     }
 
     .input-container {
@@ -116,17 +183,18 @@
       width: 100%;
       padding: 14px 50px 14px 20px;
       font-size: 16px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border);
       border-radius: 28px;
       outline: none;
-      background: #fff;
+      background: var(--bg-card);
+      color: var(--text);
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-
     .search-box:focus {
-      border-color: #1e6ff0;
+      border-color: var(--accent);
       box-shadow: 0 0 0 2px rgba(30, 111, 240, 0.15);
     }
+    .search-box::placeholder { color: var(--text-muted); }
 
     .voice-btn {
       position: absolute;
@@ -141,15 +209,8 @@
       border-radius: 50%;
       transition: background 0.2s;
     }
-
-    .voice-btn:hover {
-      background: #f0f0f0;
-    }
-
-    .voice-btn.recording {
-      color: #f44336;
-      animation: pulse 1s infinite;
-    }
+    .voice-btn:hover { background: var(--bg-section); }
+    .voice-btn.recording { color: #f44336; animation: pulse 1s infinite; }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
@@ -157,12 +218,12 @@
     }
 
     .google-btn {
-      background: #f8f9fa;
-      border: 1px solid #ccc;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 28px;
       font-size: 14px;
       font-weight: 500;
-      color: #5f6368;
+      color: var(--text-muted);
       cursor: pointer;
       padding: 0 16px;
       display: flex;
@@ -172,21 +233,83 @@
       min-width: 80px;
       transition: background 0.2s, border-color 0.2s;
     }
+    .google-btn:hover { background: var(--accent-hover); border-color: var(--accent); }
 
-    .google-btn:hover {
-      background: #e8eaed;
-      border-color: #1e6ff0;
+    /* ── Filter Tabs (Google Style) ── */
+    .filter-bar {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+      user-select: none;
     }
-
-    .search-wrapper.lifted {
-      transform: translateY(-140px);
-      margin-bottom: -116px;
+    .filter-bar.visible {
+      opacity: 1;
+      max-height: 50px;
+    }
+    .filter-tab {
+      padding: 10px 4px;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
       position: relative;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .filter-tab:hover {
+      color: var(--text);
+    }
+    .filter-tab.active {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .filter-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; /* Накладання на нижній бордер */
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px 3px 0 0;
     }
 
-    /* Недавні теми — плавна поява/зникнення */
-    .recent-section,
-    .favorites-section {
+    /* ── Share button ── */
+    .share-btn {
+      display: none;
+      margin-bottom: 12px;
+      margin-left: 8px;
+      padding: 8px 20px;
+      background: var(--bg-card);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .share-btn:hover { background: var(--accent-light); transform: scale(1.03); }
+    .share-btn.visible { display: inline-flex; align-items: center; gap: 6px; }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 4px;
+    }
+
+    /* ── Recent / Favorites ── */
+    .recent-section, .favorites-section {
       width: 100%;
       max-width: 600px;
       margin-top: 8px;
@@ -195,147 +318,132 @@
       max-height: 0;
       transition: opacity 0.3s ease, max-height 0.3s ease;
     }
-
-    .recent-section.visible,
-    .favorites-section.visible {
+    .recent-section.visible, .favorites-section.visible {
       opacity: 1;
-      max-height: 200px;
+      max-height: 220px;
     }
 
-    .recent-title,
-    .favorites-title {
-      font-size: 14px;
+    .recent-title, .favorites-title {
+      font-size: 13px;
       font-weight: 600;
-      color: #555;
-      margin: 16px 0 8px;
+      color: var(--text-label);
+      margin: 12px 0 6px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .recent-list,
-    .favorites-list {
+    .recent-list, .favorites-list {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .recent-item,
-    .favorite-item {
-      background: #eef4ff;
-      padding: 6px 12px;
+    .recent-item, .favorite-item {
+      background: var(--tag-bg);
+      padding: 6px 28px 6px 12px;
       border-radius: 16px;
       font-size: 13px;
-      color: #1e6ff0;
+      color: var(--tag-text);
       cursor: pointer;
       transition: background 0.2s;
       position: relative;
-      padding-right: 24px;
+      max-width: 100%;
     }
+    .recent-item:hover, .favorite-item:hover { background: var(--accent-hover); }
 
-    .recent-item:hover,
-    .favorite-item:hover {
-      background: #dceaff;
-    }
-
-    /* Кнопки видалення */
-    .delete-recent,
-    .delete-fav {
+    .delete-recent, .delete-fav {
       position: absolute;
-      right: 6px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 14px;
-      color: #999;
+      font-size: 12px;
+      color: var(--text-muted);
       cursor: pointer;
       opacity: 0;
       transition: opacity 0.2s;
     }
-
     .recent-item:hover .delete-recent,
-    .favorite-item:hover .delete-fav {
-      opacity: 1;
+    .favorite-item:hover .delete-fav { opacity: 1; }
+
+    /* ── Calculator ── */
+    .calculator-result {
+      display: none;
+      margin-top: 16px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--accent);
+      background: var(--calc-bg);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: opacity 0.3s ease;
+    }
+    .calculator-result.visible {
+      display: block;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+    .average-hint {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: normal;
     }
 
-    .results-section,
-    .calculator-result {
-      margin-top: 24px;
+    /* ── Results ── */
+    .results-section {
+      margin-top: 16px;
       width: 100%;
       max-width: 600px;
       transition: opacity 0.3s ease;
     }
 
-    .video-section,
-    .result-item {
-      display: none;
-    }
-
-    .video-section.visible,
+    .result-item { display: none; }
     .result-item.visible {
       display: block;
-      opacity: 1;
-      transform: translateY(0);
       animation: fadeInUp 0.3s ease forwards;
-    }
-
-    .calculator-result {
-      display: none;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: #1e6ff0;
-      background: #f9f9ff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .calculator-result.visible {
-      display: block;
-      animation: fadeInUp 0.3s ease forwards;
-    }
-
-    .average-hint {
-      font-size: 16px;
-      color: #555;
-      margin-top: 8px;
-      font-weight: normal;
     }
 
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #555;
-      margin: 16px 0 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    /* Result card */
+    .result-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      cursor: grab;
     }
+    .result-item:hover { box-shadow: 0 4px 16px var(--shadow); border-color: var(--accent); }
+    .result-item.dragging { opacity: 0.45; cursor: grabbing; }
+    .result-item.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(30,111,240,0.25); }
 
-    .result-title {
-      font-size: 18px;
-      color: #1e6ff0;
-      text-decoration: none;
-      font-weight: 500;
+    .result-header {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 4px;
-      position: relative;
     }
 
-    .result-title:hover {
-      text-decoration: underline;
+    .result-title {
+      font-size: 17px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      position: relative;
     }
+    .result-title:hover { text-decoration: underline; }
 
     .favicon {
       width: 18px;
@@ -344,246 +452,491 @@
       border-radius: 2px;
     }
 
-    .result-url {
-      font-size: 14px;
-      color: #0d6e3f;
-      margin-bottom: 4px;
+    /* Card action buttons */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
-    .result-desc {
+    .copy-btn, .fav-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--bg-section); color: var(--text); border-color: var(--text-muted); }
+    .fav-btn { font-size: 16px; padding: 4px 7px; }
+    .fav-btn.filled { color: #f4c20d; border-color: #f4c20d; background: #fffbea; }
+    [data-theme="dark"] .fav-btn.filled { background: #2a2200; }
+
+    .result-url { font-size: 13px; color: var(--green); margin-bottom: 3px; }
+    .result-desc { font-size: 13px; color: var(--text-muted); }
+
+    /* drag handle hint */
+    .drag-handle {
+      color: var(--border);
       font-size: 14px;
-      color: #666;
+      cursor: grab;
+      padding: 2px 4px;
+      user-select: none;
+      flex-shrink: 0;
     }
 
     /* Tooltip */
     .tooltip {
       position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: calc(100% + 6px);
+      left: 0;
       background: #333;
       color: #fff;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       white-space: nowrap;
       z-index: 1000;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s;
     }
+    [data-theme="dark"] .tooltip { background: #e8eaf0; color: #0f1117; }
+    .tooltip.visible { opacity: 1; }
 
-    .tooltip.visible {
-      opacity: 1;
+    /* ── Favorites note modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
     }
+    .modal-overlay.open { display: flex; }
 
-    /* Favorite star */
-    .favorite-star {
-      position: absolute;
-      right: -24px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      color: #ccc;
+    .modal {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 380px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+    .modal h3 { margin: 0 0 16px; font-size: 17px; color: var(--text); }
+
+    .modal input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      margin-bottom: 16px;
+    }
+    .modal input[type="text"]:focus { border-color: var(--accent); }
+
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-btn {
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      transition: color 0.2s;
+      border: none;
+      transition: opacity 0.2s;
     }
+    .modal-btn.primary { background: var(--accent); color: #fff; }
+    .modal-btn.secondary { background: var(--bg-section); color: var(--text-muted); }
+    .modal-btn:hover { opacity: 0.85; }
 
-    .favorite-star.filled {
-      color: #f4c20d;
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--toast-bg);
+      color: var(--toast-text);
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
     }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── Footer ── */
     footer {
       text-align: center;
-      padding: 24px;
-      border-top: 1px solid #eee;
+      padding: 20px;
+      border-top: 1px solid var(--footer-border);
       font-size: 14px;
-      color: #666;
-      background: #fff;
+      color: var(--text-muted);
+      background: var(--footer-bg);
       margin-top: auto;
+      transition: background 0.3s, border-color 0.3s;
     }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
 
-    footer a {
-      color: #1e6ff0;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .container { padding-top: 220px; }
+      .header { top: 90px; }
+      .logo { font-size: 26px; }
+      .result-item { padding: 12px; }
+      .filter-tab { font-size: 13px; padding: 10px 2px; }
+      .filter-bar { gap: 10px; }
     }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" title="Змінити тему">🌙</button>
+
   <div class="container">
-  <div class="header" id="header">
-    <div class="logo">
-      <img src="https://raw.githubusercontent.com/CodenameXXV/EduSearch/refs/heads/main/search.png" 
-           alt="Logo" 
-           class="logo-icon">
-      <span class="logo-text">Educational Search</span>
+    <div class="header" id="header">
+      <div class="logo">
+        <img src="https://raw.githubusercontent.com/CodenameXXV/EduSearch/refs/heads/main/search.png"
+             alt="Logo" class="logo-icon">
+        <span class="logo-text">Educational Search</span>
+      </div>
+      <div class="subtitle">Пошук освітніх матеріалів за темою</div>
     </div>
-    <div class="subtitle">Пошук освітніх матеріалів за темою</div>
-  </div>
 
     <div class="search-wrapper" id="searchWrapper">
       <div class="input-container">
-        <input type="text" id="keywords" class="search-box" placeholder="Наприклад: past simple, climate change... або 5+3+2" autocomplete="off" />
+        <input type="text" id="keywords" class="search-box"
+               placeholder="Наприклад: past simple, climate change..."
+               autocomplete="off" />
         <button class="voice-btn" id="voiceBtn" title="Голосове введення">🎙️</button>
       </div>
-      <button class="google-btn" id="googleBtn">Google</button>
+      <button class="google-btn" id="googleBtn">Загуглити</button>
     </div>
 
-    <!-- Недавні теми -->
+    <div class="filter-bar" id="filterBar">
+      <span class="filter-tab active" data-filter="all">Усі</span>
+      <span class="filter-tab" data-filter="games">🎮 Ігри</span>
+      <span class="filter-tab" data-filter="worksheets">📄 Аркуші</span>
+      <span class="filter-tab" data-filter="tests">✅ Тести</span>
+      <span class="filter-tab" data-filter="presentations">📊 Презентації</span>
+      <span class="filter-tab" data-filter="video">🎬 Відео</span>
+    </div>
+
+    <div class="action-row" id="actionRow">
+      <button class="share-btn" id="shareBtn">🔗 Поділитися добіркою</button>
+    </div>
+
     <div class="recent-section" id="recent-section">
       <div class="recent-title">Недавні теми</div>
       <div class="recent-list" id="recent-list"></div>
     </div>
 
-    <!-- Улюблене -->
     <div class="favorites-section" id="favorites-section">
       <div class="favorites-title">Улюблене</div>
       <div class="favorites-list" id="favorites-list"></div>
     </div>
 
-    <!-- Калькулятор-результат -->
     <div class="calculator-result" id="calculatorResult"></div>
 
-    <!-- Основні ресурси -->
     <div class="results-section" id="main-results">
-      <div class="result-item" id="item-wordwall">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=wordwall.net" alt="">
-          <span></span>
-          <div class="tooltip">Wordwall — створюйте ігри за 2 хвилини</div>
-        </a>
+      <div class="result-item" id="item-wordwall" data-type="games" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle" title="Перетягнути">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=wordwall.net" alt="">
+            <span></span>
+            <div class="tooltip">Wordwall — створюйте ігри за 2 хвилини</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn" title="Скопіювати посилання">📋 Копіювати</button>
+            <button class="fav-btn" data-id="wordwall" title="Додати в улюблене">☆</button>
+          </div>
+        </div>
         <div class="result-url">wordwall.net</div>
         <div class="result-desc">Спільнота Wordwall: інтерактивні завдання</div>
-        <span class="favorite-star" data-id="wordwall">☆</span>
-      </div>
-      <div class="result-item" id="item-liveworksheets">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=liveworksheets.com" alt="">
-          <span></span>
-          <div class="tooltip">Liveworksheets — інтерактивні робочі аркуші</div>
-        </a>
-        <div class="result-url">liveworksheets.com</div>
-        <div class="result-desc">Інтерактивні робочі аркуші</div>
-        <span class="favorite-star" data-id="liveworksheets">☆</span>
-      </div>
-      <div class="result-item" id="item-islcollective-worksheets">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
-          <span></span>
-          <div class="tooltip">ISL Collective — друковані та цифрові матеріали</div>
-        </a>
-        <div class="result-url">islcollective.com</div>
-        <div class="result-desc">Друковані та цифрові матеріали</div>
-        <span class="favorite-star" data-id="islcollectiveWorksheets">☆</span>
-      </div>
-      <div class="result-item" id="item-learningapps">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=learningapps.org" alt="">
-          <span></span>
-          <div class="tooltip">LearningApps — інтерактивні завдання та гри</div>
-        </a>
-        <div class="result-url">learningapps.org</div>
-        <div class="result-desc">Інтерактивні завдання та гри</div>
-        <span class="favorite-star" data-id="learningapps">☆</span>
-      </div>
-      <div class="result-item" id="item-naurok-presentations">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
-          <span></span>
-          <div class="tooltip">На Урок — презентації</div>
-        </a>
-        <div class="result-url">naurok.com.ua (презентації)</div>
-        <div class="result-desc">Презентації на «На Урок»</div>
-        <span class="favorite-star" data-id="naurokPresentations">☆</span>
-      </div>
-      <div class="result-item" id="item-naurok-tests">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
-          <span></span>
-          <div class="tooltip">На Урок — тести</div>
-        </a>
-        <div class="result-url">naurok.com.ua (тести)</div>
-        <div class="result-desc">Тести на «На Урок»</div>
-        <span class="favorite-star" data-id="naurokTests">☆</span>
-      </div>
-      <div class="result-item" id="item-vseosvita">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=vseosvita.ua" alt="">
-          <span></span>
-          <div class="tooltip">Всеосвіта — методичні матеріали</div>
-        </a>
-        <div class="result-url">vseosvita.ua</div>
-        <div class="result-desc">Матеріали на «Всеосвіта»</div>
-        <span class="favorite-star" data-id="vseosvita">☆</span>
       </div>
 
-      <!-- Kahoot + Quizlet -->
-      <div class="result-item" id="item-kahoot">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=kahoot.com" alt="">
-          <span></span>
-          <div class="tooltip">Kahoot! — інтерактивні вікторини</div>
-        </a>
+      <div class="result-item" id="item-kahoot" data-type="games" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=kahoot.com" alt="">
+            <span></span>
+            <div class="tooltip">Kahoot! — інтерактивні вікторини</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="kahoot">☆</button>
+          </div>
+        </div>
         <div class="result-url">kahoot.com</div>
         <div class="result-desc">Інтерактивні вікторини для класу</div>
-        <span class="favorite-star" data-id="kahoot">☆</span>
-      </div>
-      <div class="result-item" id="item-quizlet">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=quizlet.com" alt="">
-          <span></span>
-          <div class="tooltip">Quizlet — картки, вивчення слів</div>
-        </a>
-        <div class="result-url">quizlet.com</div>
-        <div class="result-desc">Картки, вправи, тестування</div>
-        <span class="favorite-star" data-id="quizlet">☆</span>
       </div>
 
-      <!-- ClassTools -->
-      <div class="result-item" id="item-classtools">
-        <a href="#" class="result-title" target="_blank" rel="noopener">
-          <img class="favicon" src="https://www.google.com/s2/favicons?domain=classtools.net" alt="">
-          <span></span>
-          <div class="tooltip">ClassTools.net — генератори ігор (Arcade, Timeline тощо)</div>
-        </a>
+      <div class="result-item" id="item-learningapps" data-type="games" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=learningapps.org" alt="">
+            <span></span>
+            <div class="tooltip">LearningApps — інтерактивні завдання та ігри</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="learningapps">☆</button>
+          </div>
+        </div>
+        <div class="result-url">learningapps.org</div>
+        <div class="result-desc">Інтерактивні завдання та ігри</div>
+      </div>
+
+      <div class="result-item" id="item-classtools" data-type="games" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=classtools.net" alt="">
+            <span></span>
+            <div class="tooltip">ClassTools.net — генератори ігор (Arcade, Timeline тощо)</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="classtools">☆</button>
+          </div>
+        </div>
         <div class="result-url">classtools.net</div>
         <div class="result-desc">Генератори ігор, діаграм, таймлайнів</div>
-        <span class="favorite-star" data-id="classtools">☆</span>
       </div>
-    </div>
 
-    <!-- Відео-секція -->
-    <div class="results-section">
-      <div class="video-section" id="video-section">
-        <div class="section-title">Відео</div>
+      <div class="result-item" id="item-liveworksheets" data-type="worksheets" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=liveworksheets.com" alt="">
+            <span></span>
+            <div class="tooltip">Liveworksheets — інтерактивні робочі аркуші</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="liveworksheets">☆</button>
+          </div>
+        </div>
+        <div class="result-url">liveworksheets.com</div>
+        <div class="result-desc">Інтерактивні робочі аркуші</div>
+      </div>
 
-        <div class="result-item" id="item-islcollective-videos">
+      <div class="result-item" id="item-islcollective-worksheets" data-type="worksheets" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
+            <span></span>
+            <div class="tooltip">ISL Collective — друковані та цифрові матеріали</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="islcollectiveWorksheets">☆</button>
+          </div>
+        </div>
+        <div class="result-url">islcollective.com</div>
+        <div class="result-desc">Друковані та цифрові матеріали</div>
+      </div>
+
+      <div class="result-item" id="item-enghub" data-type="worksheets" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=enghub.pro" alt="">
+            <span></span>
+            <div class="tooltip">Enghub — уроки та аркуші</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="enghub">☆</button>
+          </div>
+        </div>
+        <div class="result-url">enghub.pro</div>
+        <div class="result-desc">Готові уроки та робочі аркуші з англійської</div>
+      </div>
+
+      <div class="result-item" id="item-wizerme" data-type="worksheets" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=wizer.me" alt="">
+            <span></span>
+            <div class="tooltip">Wizer.me — інтерактивні робочі аркуші</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="wizerme">☆</button>
+          </div>
+        </div>
+        <div class="result-url">wizer.me</div>
+        <div class="result-desc">Створення та пошук інтерактивних аркушів</div>
+      </div>
+
+      <div class="result-item" id="item-quizlet" data-type="tests" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=quizlet.com" alt="">
+            <span></span>
+            <div class="tooltip">Quizlet — картки, вивчення слів</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="quizlet">☆</button>
+          </div>
+        </div>
+        <div class="result-url">quizlet.com</div>
+        <div class="result-desc">Картки, вправи, тестування</div>
+      </div>
+
+      <div class="result-item" id="item-naurok-tests" data-type="tests" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
+            <span></span>
+            <div class="tooltip">На Урок — тести</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="naurokTests">☆</button>
+          </div>
+        </div>
+        <div class="result-url">naurok.com.ua (тести)</div>
+        <div class="result-desc">Тести на «На Урок»</div>
+      </div>
+
+      <div class="result-item" id="item-classtime" data-type="tests" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=classtime.com" alt="">
+            <span></span>
+            <div class="tooltip">Classtime — інтерактивні тести та завдання</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="classtime">☆</button>
+          </div>
+        </div>
+        <div class="result-url">classtime.com</div>
+        <div class="result-desc">Інтерактивні сесії та тести для учнів</div>
+      </div>
+
+      <div class="result-item" id="item-naurok-presentations" data-type="presentations" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=naurok.com.ua" alt="">
+            <span></span>
+            <div class="tooltip">На Урок — презентації</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="naurokPresentations">☆</button>
+          </div>
+        </div>
+        <div class="result-url">naurok.com.ua (презентації)</div>
+        <div class="result-desc">Презентації на «На Урок»</div>
+      </div>
+
+      <div class="result-item" id="item-vseosvita" data-type="presentations" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=vseosvita.ua" alt="">
+            <span></span>
+            <div class="tooltip">Всеосвіта — методичні матеріали</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="vseosvita">☆</button>
+          </div>
+        </div>
+        <div class="result-url">vseosvita.ua</div>
+        <div class="result-desc">Матеріали на «Всеосвіта»</div>
+      </div>
+
+      <div class="result-item" id="item-svitppt" data-type="presentations" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=svitppt.com.ua" alt="">
+            <span></span>
+            <div class="tooltip">Світ ППТ — презентації українською</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="svitppt">☆</button>
+          </div>
+        </div>
+        <div class="result-url">svitppt.com.ua</div>
+        <div class="result-desc">Велика база готових презентацій</div>
+      </div>
+
+      <div class="result-item" id="item-islcollective-videos" data-type="video" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
           <a href="#" class="result-title" target="_blank" rel="noopener">
             <img class="favicon" src="https://www.google.com/s2/favicons?domain=islcollective.com" alt="">
             <span></span>
             <div class="tooltip">ISL Collective Videos — інтерактивні відеоуроки</div>
           </a>
-          <div class="result-url">islcollective.com/video</div>
-          <div class="result-desc">Інтерактивні відеоуроки з завданнями</div>
-          <span class="favorite-star" data-id="islcollectiveVideos">☆</span>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="islcollectiveVideos">☆</button>
+          </div>
         </div>
-        <div class="result-item" id="item-youtube">
+        <div class="result-url">islcollective.com/video</div>
+        <div class="result-desc">Інтерактивні відеоуроки з завданнями</div>
+      </div>
+
+      <div class="result-item" id="item-youtube" data-type="video" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
           <a href="#" class="result-title" target="_blank" rel="noopener">
             <img class="favicon" src="https://www.google.com/s2/favicons?domain=youtube.com" alt="">
             <span></span>
             <div class="tooltip">YouTube — навчальні відео</div>
           </a>
-          <div class="result-url">youtube.com</div>
-          <div class="result-desc">Навчальні відео на YouTube</div>
-          <span class="favorite-star" data-id="youtube">☆</span>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="youtube">☆</button>
+          </div>
         </div>
+        <div class="result-url">youtube.com</div>
+        <div class="result-desc">Навчальні відео на YouTube</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="noteModal">
+    <div class="modal">
+      <h3>Примітка для улюбленого</h3>
+      <input type="text" id="noteInput" placeholder="Наприклад: для 7Б, тема October" maxlength="80" />
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="noteCancelBtn">Скасувати</button>
+        <button class="modal-btn primary" id="noteSaveBtn">Зберегти ⭐</button>
       </div>
     </div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <footer>
     Автор: <a href="https://codenamexxv.github.io/teacher/" target="_blank" rel="noopener">Ігор Шуляк</a><br>
@@ -591,290 +944,270 @@
   </footer>
 
   <script>
-    // === Debounce utility ===
+    // ── Debounce ──
     function debounce(func, wait) {
       let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
+      return function(...args) {
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => func(...args), wait);
       };
     }
 
-    // === DOM Elements ===
+    // ── Toast ──
+    function showToast(msg, duration = 2200) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // ── Theme ──
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      themeToggle.textContent = dark ? '☀️' : '🌙';
+      localStorage.setItem('eduSearchTheme', dark ? 'dark' : 'light');
+    }
+    (function initTheme() {
+      const saved = localStorage.getItem('eduSearchTheme');
+      // За замовчуванням біла тема (якщо немає збереженого налаштування на темну)
+      applyTheme(saved === 'dark');
+    })();
+    themeToggle.addEventListener('click', () => {
+      applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark');
+    });
+
+    // ── Animated placeholder ──
+    const placeholders = [
+      'past simple...', 'present perfect...', 'climate change...', 'animals...',
+      'countries and capitals...', 'conditionals...', 'modal verbs...', 'weather...',
+      'healthy lifestyle...', 'space and universe...'
+    ];
+    let phIdx = 0;
+    const input = document.getElementById('keywords');
+    function rotatePlaceholder() {
+      if (document.activeElement === input) return;
+      phIdx = (phIdx + 1) % placeholders.length;
+      input.placeholder = placeholders[phIdx];
+    }
+    setInterval(rotatePlaceholder, 2800);
+
+    // ── DOM refs ──
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
-    const voiceBtn = document.getElementById('voiceBtn');
-    const googleBtn = document.getElementById('googleBtn');
-    const input = document.getElementById('keywords');
-    const header = document.getElementById('header');
+    const voiceBtn      = document.getElementById('voiceBtn');
+    const googleBtn     = document.getElementById('googleBtn');
+    const header        = document.getElementById('header');
     const searchWrapper = document.getElementById('searchWrapper');
     const calculatorResult = document.getElementById('calculatorResult');
     const recentSection = document.getElementById('recent-section');
-    const recentList = document.getElementById('recent-list');
+    const recentList    = document.getElementById('recent-list');
     const favoritesSection = document.getElementById('favorites-section');
     const favoritesList = document.getElementById('favorites-list');
+    const filterBar     = document.getElementById('filterBar');
+    const shareBtn      = document.getElementById('shareBtn');
+    const noteModal     = document.getElementById('noteModal');
+    const noteInput     = document.getElementById('noteInput');
 
-    // === Platform items ===
-    const mainItems = {
-      wordwall: document.getElementById('item-wordwall'),
-      liveworksheets: document.getElementById('item-liveworksheets'),
-      islcollectiveWorksheets: document.getElementById('item-islcollective-worksheets'),
-      learningapps: document.getElementById('item-learningapps'),
-      naurokPresentations: document.getElementById('item-naurok-presentations'),
-      naurokTests: document.getElementById('item-naurok-tests'),
-      vseosvita: document.getElementById('item-vseosvita'),
-      kahoot: document.getElementById('item-kahoot'),
-      quizlet: document.getElementById('item-quizlet'),
-      classtools: document.getElementById('item-classtools')
+    // ── Platform map ──
+    const PLATFORMS = {
+      wordwall:                { id: 'item-wordwall',                type: 'games' },
+      kahoot:                  { id: 'item-kahoot',                  type: 'games' },
+      learningapps:            { id: 'item-learningapps',            type: 'games' },
+      classtools:              { id: 'item-classtools',              type: 'games' },
+      liveworksheets:          { id: 'item-liveworksheets',          type: 'worksheets' },
+      islcollectiveWorksheets: { id: 'item-islcollective-worksheets',type: 'worksheets' },
+      enghub:                  { id: 'item-enghub',                  type: 'worksheets' },
+      wizerme:                 { id: 'item-wizerme',                 type: 'worksheets' },
+      quizlet:                 { id: 'item-quizlet',                 type: 'tests' },
+      naurokTests:             { id: 'item-naurok-tests',            type: 'tests' },
+      classtime:               { id: 'item-classtime',               type: 'tests' },
+      naurokPresentations:     { id: 'item-naurok-presentations',    type: 'presentations' },
+      vseosvita:               { id: 'item-vseosvita',               type: 'presentations' },
+      svitppt:                 { id: 'item-svitppt',                 type: 'presentations' },
+      islcollectiveVideos:     { id: 'item-islcollective-videos',    type: 'video' },
+      youtube:                 { id: 'item-youtube',                 type: 'video' },
     };
 
-    const videoItems = {
-      islcollectiveVideos: document.getElementById('item-islcollective-videos'),
-      youtube: document.getElementById('item-youtube')
-    };
+    function getItem(key) { return document.getElementById(PLATFORMS[key].id); }
+    function allItems()   { return Object.keys(PLATFORMS).map(k => getItem(k)); }
 
-    const videoSection = document.getElementById('video-section');
-
-    // === Helper: build URL for platform ===
+    // ── Build URL ──
     function buildPlatformUrl(platformId, query) {
-      const encodedForGoogle = encodeURIComponent(query);
-      const plusFormat = query.replace(/\s+/g, '+');
-
+      const enc = encodeURIComponent(query);
+      const plus = query.trim().replace(/\s+/g, '+');
       switch (platformId) {
-        case 'classtools':
-          return 'https://www.classtools.net/_SEARCH/index.php';
-
-        case 'kahoot':
-          return `https://kahoot.com/search/?t=${plusFormat}&post_type=`;
-
-        case 'quizlet':
-          const spaceEncoded = query.replace(/\s+/g, '%20');
-          return `https://quizlet.com/search?query=${spaceEncoded}`;
-
-        case 'wordwall':
-          // ✅ Правильне формування slug з кирилицею
-          const slug = query.trim().replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
-          return `https://wordwall.net/uk-ua/community/${slug}`;
-
-        case 'liveworksheets':
-          return `https://www.liveworksheets.com/search-worksheets?keys=${encodedForGoogle}`;
-
-        case 'islcollectiveWorksheets':
-          return `https://en.islcollective.com/english-esl-worksheets/search/${plusFormat}`;
-
-        case 'learningapps':
-          return `https://learningapps.org/index.php?s=${encodedForGoogle}`;
-
-        case 'naurokPresentations':
-          return `https://naurok.com.ua/biblioteka/typ-17?q=${encodedForGoogle}`;
-
-        case 'naurokTests':
-          return `https://naurok.com.ua/test?q=${encodedForGoogle}`;
-
-        case 'vseosvita':
-          return `https://vseosvita.ua/library?s=${encodedForGoogle}&cat=&is_pay=0&is_ai=&status_show=&order=3&page=&quest_type=&type_control=&id_folder=&class=&type=&title_only=`;
-
-        case 'islcollectiveVideos':
-          return `https://en.islcollective.com/english-esl-video-lessons/search/${plusFormat}`;
-
-        case 'youtube':
-          return `https://www.youtube.com/results?search_query=${plusFormat}`;
-
-        default:
-          return '#';
+        case 'classtools':           return 'https://www.classtools.net/_SEARCH/index.php';
+        case 'kahoot':               return `https://kahoot.com/search/?t=${plus}&post_type=`;
+        case 'quizlet':              return `https://quizlet.com/search?query=${query.replace(/\s+/g,'%20')}`;
+        case 'wordwall':             return `https://wordwall.net/uk-ua/community/${query.trim().replace(/\s+/g,'-').replace(/^-+|-+$/g,'')}`;
+        case 'liveworksheets':       return `https://www.liveworksheets.com/search-worksheets?keys=${enc}`;
+        case 'islcollectiveWorksheets': return `https://en.islcollective.com/english-esl-worksheets/search/${plus}`;
+        case 'learningapps':         return `https://learningapps.org/index.php?s=${enc}`;
+        case 'naurokPresentations':  return `https://naurok.com.ua/biblioteka/typ-17?q=${enc}`;
+        case 'naurokTests':          return `https://naurok.com.ua/test?q=${enc}`;
+        case 'vseosvita':            return `https://vseosvita.ua/library?s=${enc}&cat=&is_pay=0&is_ai=&status_show=&order=3&page=&quest_type=&type_control=&id_folder=&class=&type=&title_only=`;
+        case 'islcollectiveVideos':  return `https://en.islcollective.com/english-esl-video-lessons/search/${plus}`;
+        case 'youtube':              return `https://www.youtube.com/results?search_query=${plus}`;
+        case 'enghub':               return `https://enghub.pro/lessons?search=${plus}`;
+        case 'svitppt':              return `https://svitppt.com.ua/search.html?text=${plus}`;
+        case 'classtime':            return `https://www.classtime.com/curriculum/search/?query=${enc}`;
+        case 'wizerme':              return `https://app.wizer.me/dashboard/community?q=${enc}`;
+        default: return '#';
       }
     }
 
-    // === Voice Recognition ===
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'uk-UA';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      let stopTimeout = null;
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        input.value = transcript;
-        debouncedUpdate();
-        saveRecentQuery(transcript);
-        updateVoiceButton();
-      };
-
-      recognition.onerror = (event) => {
-        console.error('Помилка:', event.error);
-        stopRecording();
-      };
-
-      recognition.onend = () => {
-        if (stopTimeout) clearTimeout(stopTimeout);
-        stopRecording();
-      };
+    // ── Math (safe parser — no new Function) ──
+    function safeMathEval(expr) {
+      expr = expr.trim().replace(/\s+/g, '');
+      try {
+        const result = parseExpr(expr, {pos:0});
+        return (typeof result === 'number' && isFinite(result)) ? result : null;
+      } catch(e) { return null; }
     }
-
-    function startVoiceInput() {
-      if (!recognition) {
-        alert('Ваш браузер не підтримує голосове введення. Спробуйте Chrome або Edge.');
-        return;
+    function parseExpr(str, ctx) {
+      let val = parseTerm(str, ctx);
+      while (ctx.pos < str.length && (str[ctx.pos] === '+' || str[ctx.pos] === '-')) {
+        const op = str[ctx.pos++];
+        const right = parseTerm(str, ctx);
+        val = op === '+' ? val + right : val - right;
       }
-
-      if (voiceBtn.classList.contains('recording')) {
-        recognition.stop();
-      } else {
-        voiceBtn.textContent = '⏹';
-        voiceBtn.classList.add('recording');
-        recognition.start();
-
-        stopTimeout = setTimeout(() => {
-          recognition.stop();
-        }, 4000);
-      }
+      return val;
     }
-
-    function stopRecording() {
-      voiceBtn.classList.remove('recording');
-      voiceBtn.textContent = '🎙️';
-      if (stopTimeout) clearTimeout(stopTimeout);
-    }
-
-    // === Мікрофон / ❌ кнопка ===
-    function updateVoiceButton() {
-      const isEmpty = input.value.trim() === '';
-      if (isEmpty) {
-        voiceBtn.textContent = '🎙️';
-        voiceBtn.title = 'Голосове введення';
-        voiceBtn.onclick = startVoiceInput;
-      } else {
-        voiceBtn.textContent = '❌';
-        voiceBtn.title = 'Очистити поле';
-        voiceBtn.onclick = () => {
-          input.value = '';
-          updateVoiceButton();
-          updateResultsNow();
-          input.focus();
-        };
+    function parseTerm(str, ctx) {
+      let val = parseFactor(str, ctx);
+      while (ctx.pos < str.length && (str[ctx.pos] === '*' || str[ctx.pos] === '/')) {
+        const op = str[ctx.pos++];
+        const right = parseFactor(str, ctx);
+        if (op === '/' && right === 0) throw new Error('div0');
+        val = op === '*' ? val * right : val / right;
       }
-      if (voiceBtn.classList.contains('recording')) {
-        stopRecording();
-      }
+      return val;
     }
-
-    // === Google Search ===
-    function searchInGoogle() {
-      const query = input.value.trim();
-      if (query) {
-        const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        window.open(url, '_blank', 'noopener,noreferrer');
-      } else {
-        window.open('https://www.google.com', '_blank', 'noopener,noreferrer');
+    function parseFactor(str, ctx) {
+      if (str[ctx.pos] === '(') {
+        ctx.pos++;
+        const val = parseExpr(str, ctx);
+        if (str[ctx.pos] !== ')') throw new Error('missing )');
+        ctx.pos++;
+        return val;
       }
+      if (str[ctx.pos] === '-') { ctx.pos++; return -parseFactor(str, ctx); }
+      const start = ctx.pos;
+      while (ctx.pos < str.length && /[\d.]/.test(str[ctx.pos])) ctx.pos++;
+      if (ctx.pos === start) throw new Error('unexpected char: ' + str[ctx.pos]);
+      return parseFloat(str.slice(start, ctx.pos));
     }
-
-    googleBtn.addEventListener('click', searchInGoogle);
-
-    // === Enter Key Handling ===
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const value = input.value.trim();
-        if (value && isMathExpression(value)) {
-          const result = safeEvaluate(value);
-          if (result !== null) {
-            updateResultsNow();
-            return;
-          }
-        }
-        searchInGoogle();
-      }
-    });
-
-    // === Show/hide Recent on focus/blur ===
-    input.addEventListener('focus', () => {
-      if (JSON.parse(localStorage.getItem('eduSearchRecents') || '[]').length > 0) {
-        recentSection.classList.add('visible');
-      }
-      updateVoiceButton();
-    });
-
-    input.addEventListener('blur', () => {
-      setTimeout(() => {
-        if (!recentList.contains(document.activeElement)) {
-          recentSection.classList.remove('visible');
-        }
-      }, 200);
-      updateVoiceButton();
-    });
-
-    // === Input handling ===
-    input.addEventListener('input', () => {
-      updateVoiceButton();
-      debouncedUpdate();
-    });
-
-    // === Math Functions ===
-    function isOnlyAddition(expr) {
-      const clean = expr.trim().replace(/\s+/g, '');
-      if (!clean.includes('+')) return false;
-      if (/[-*/()]/.test(clean)) return false;
-      const parts = clean.split('+');
-      return parts.every(part => part !== '' && !isNaN(parseFloat(part)) && isFinite(parseFloat(part)));
-    }
-
-    function extractNumbersFromAddition(expr) {
-      const clean = expr.trim().replace(/\s+/g, '');
-      return clean.split('+').map(s => parseFloat(s));
-    }
-
     function isMathExpression(str) {
-      const trimmed = str.trim();
-      if (!trimmed) return false;
-      if (!/\d/.test(trimmed)) return false;
-      if (!/^[\d\s+\-*/().]+$/.test(trimmed)) return false;
-      if (/^[*/+]|\+$|[\-*/+)]$/.test(trimmed)) return false;
-      if (/[\-+*/]{2,}/.test(trimmed.replace(/\(\s*-/g, ''))) return false;
+      const t = str.trim();
+      if (!t || !/\d/.test(t)) return false;
+      if (!/^[\d\s+\-*/().]+$/.test(t)) return false;
       return true;
     }
-
-    function safeEvaluate(expr) {
-      try {
-        const result = new Function('return (' + expr + ')')();
-        if (typeof result === 'number' && isFinite(result)) {
-          return result;
-        }
-      } catch (e) {
-        return null;
-      }
-      return null;
+    function isOnlyAddition(expr) {
+      const c = expr.trim().replace(/\s+/g,'');
+      if (!c.includes('+') || /[-*/()]/.test(c)) return false;
+      return c.split('+').every(p => p !== '' && !isNaN(parseFloat(p)));
     }
 
-    // === Tooltip Logic ===
-    document.querySelectorAll('.result-title').forEach(link => {
-      const tooltip = link.querySelector('.tooltip');
-      link.addEventListener('mouseenter', () => {
-        tooltip.classList.add('visible');
-      });
-      link.addEventListener('mouseleave', () => {
-        tooltip.classList.remove('visible');
+    // ── Filters ──
+    let activeFilter = 'all';
+    filterBar.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterBar.querySelectorAll('.filter-tab').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        activeFilter = tab.dataset.filter;
+        applyFilter();
       });
     });
 
-    // === Favorites ===
+    function applyFilter() {
+      const value = input.value.trim();
+      if (!value) return;
+      Object.keys(PLATFORMS).forEach(key => {
+        const el = getItem(key);
+        const type = PLATFORMS[key].type;
+        if (activeFilter === 'all' || type === activeFilter) {
+          el.classList.add('visible');
+        } else {
+          el.classList.remove('visible');
+        }
+      });
+    }
+
+    // ── Share ──
+    shareBtn.addEventListener('click', () => {
+      const value = input.value.trim();
+      if (!value) return;
+      let lines = [`🔍 Пошук: "${value}"\n`];
+      Object.keys(PLATFORMS).forEach(key => {
+        const el = getItem(key);
+        if (el.classList.contains('visible')) {
+          const url = buildPlatformUrl(key, value);
+          const label = el.querySelector('.result-url').textContent;
+          if (url !== '#') lines.push(`• ${label}: ${url}`);
+        }
+      });
+      const text = lines.join('\n');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => showToast('📋 Добірку скопійовано в буфер!'));
+      } else {
+        prompt('Скопіюйте добірку:', text);
+      }
+    });
+
+    // ── Copy button per card ──
+    function attachCopyButtons() {
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const item = btn.closest('.result-item');
+          const link = item.querySelector('.result-title');
+          const url = link.href;
+          if (!url || url === '#' || url === location.href + '#') {
+            showToast('⚠️ Спочатку введіть запит');
+            return;
+          }
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(() => showToast('📋 Посилання скопійовано!'));
+          } else {
+            prompt('Скопіюйте посилання:', url);
+          }
+        });
+      });
+    }
+    attachCopyButtons();
+
+    // ── Favorites with note modal ──
+    let pendingFavPlatform = null;
+    let pendingFavQuery = null;
+
+    document.getElementById('noteCancelBtn').addEventListener('click', () => {
+      noteModal.classList.remove('open');
+      pendingFavPlatform = null;
+      pendingFavQuery = null;
+    });
+
+    document.getElementById('noteSaveBtn').addEventListener('click', () => {
+      if (pendingFavPlatform && pendingFavQuery) {
+        saveFavorite(pendingFavPlatform, pendingFavQuery, noteInput.value.trim());
+        showToast('⭐ Додано в улюблене!');
+      }
+      noteModal.classList.remove('open');
+      pendingFavPlatform = null;
+      pendingFavQuery = null;
+    });
+
     function loadFavorites() {
       const favs = JSON.parse(localStorage.getItem('eduSearchFavorites') || '[]');
       renderFavorites(favs);
     }
 
-    function saveFavorite(platformId, query) {
+    function saveFavorite(platformId, query, note) {
       let favs = JSON.parse(localStorage.getItem('eduSearchFavorites') || '[]');
       const existingIndex = favs.findIndex(f => f.platform === platformId && f.query === query);
       if (existingIndex === -1) {
-        favs.push({ platform: platformId, query, timestamp: Date.now() });
+        favs.push({ platform: platformId, query, note: note || '', timestamp: Date.now() });
         if (favs.length > 20) favs.shift();
       }
       localStorage.setItem('eduSearchFavorites', JSON.stringify(favs));
@@ -891,56 +1224,52 @@
 
     function renderFavorites(favs) {
       favoritesList.innerHTML = '';
-      if (favs.length === 0) {
-        favoritesSection.classList.remove('visible');
-        return;
-      }
+      if (favs.length === 0) { favoritesSection.classList.remove('visible'); return; }
       favoritesSection.classList.add('visible');
       const visibleFavs = favs.slice(-10).reverse();
       visibleFavs.forEach((fav, idx) => {
         const realIdx = favs.length - 1 - idx;
         const el = document.createElement('div');
         el.className = 'favorite-item';
-        el.innerHTML = `
-          ${fav.query} → ${fav.platform}
-          <span class="delete-fav" data-index="${realIdx}">🗙</span>
-        `;
-        el.title = `Click to go to "${fav.query}" on ${fav.platform}`;
+        const label = fav.note ? `${fav.query} → ${fav.platform} (${fav.note})` : `${fav.query} → ${fav.platform}`;
+        el.innerHTML = `${label}<span class="delete-fav" data-index="${realIdx}">✕</span>`;
+        el.title = `Відкрити "${fav.query}" на ${fav.platform}`;
         el.addEventListener('click', (e) => {
           if (e.target.classList.contains('delete-fav')) return;
           const url = buildPlatformUrl(fav.platform, fav.query);
-          if (url !== '#') {
-            window.open(url, '_blank', 'noopener,noreferrer');
-            saveRecentQuery(fav.query);
-          }
+          if (url !== '#') { window.open(url, '_blank', 'noopener,noreferrer'); saveRecentQuery(fav.query); }
         });
         favoritesList.appendChild(el);
       });
-
       document.querySelectorAll('.delete-fav').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const idx = parseInt(btn.dataset.index, 10);
-          removeFavorite(idx);
+          removeFavorite(parseInt(btn.dataset.index, 10));
         });
       });
     }
 
-    // Attach favorite stars
-    document.querySelectorAll('.favorite-star').forEach(star => {
-      star.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const platformId = star.dataset.id;
-        const query = input.value.trim();
-        if (!query) return;
-        star.classList.toggle('filled');
-        if (star.classList.contains('filled')) {
-          saveFavorite(platformId, query);
-        }
+    function attachFavButtons() {
+      document.querySelectorAll('.fav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const platformId = btn.dataset.id;
+          const query = input.value.trim();
+          if (!query) { showToast('⚠️ Спочатку введіть запит'); return; }
+          btn.classList.toggle('filled');
+          if (btn.classList.contains('filled')) {
+            pendingFavPlatform = platformId;
+            pendingFavQuery = query;
+            noteInput.value = '';
+            noteModal.classList.add('open');
+            setTimeout(() => noteInput.focus(), 50);
+          }
+        });
       });
-    });
+    }
+    attachFavButtons();
 
-    // === Recent Queries ===
+    // ── Recent Queries ──
     function saveRecentQuery(query) {
       if (!query) return;
       let recents = JSON.parse(localStorage.getItem('eduSearchRecents') || '[]');
@@ -961,14 +1290,11 @@
 
     function renderRecents(recents) {
       recentList.innerHTML = '';
-      if (recents.length === 0) {
-        recentSection.classList.remove('visible');
-        return;
-      }
+      if (recents.length === 0) { recentSection.classList.remove('visible'); return; }
       recents.forEach((q, idx) => {
         const el = document.createElement('div');
         el.className = 'recent-item';
-        el.innerHTML = `${q}<span class="delete-recent" data-index="${idx}">🗙</span>`;
+        el.innerHTML = `${q}<span class="delete-recent" data-index="${idx}">✕</span>`;
         el.onclick = (e) => {
           if (e.target.classList.contains('delete-recent')) return;
           input.value = q;
@@ -978,99 +1304,198 @@
         };
         recentList.appendChild(el);
       });
-
       document.querySelectorAll('.delete-recent').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const idx = parseInt(btn.dataset.index, 10);
-          removeRecentQuery(idx);
+          removeRecentQuery(parseInt(btn.dataset.index, 10));
         });
       });
     }
 
-    function loadRecents() {
-      const recents = JSON.parse(localStorage.getItem('eduSearchRecents') || '[]');
-      renderRecents(recents);
+    // ── Drag & Drop reorder ──
+    let dragSrc = null;
+
+    function setupDragDrop() {
+      document.querySelectorAll('.result-item[draggable]').forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          dragSrc = item;
+          item.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+          document.querySelectorAll('.result-item').forEach(i => i.classList.remove('drag-over'));
+          saveOrder();
+        });
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (dragSrc && dragSrc !== item) {
+            document.querySelectorAll('.result-item').forEach(i => i.classList.remove('drag-over'));
+            item.classList.add('drag-over');
+            const parent = item.parentNode;
+            const items = [...parent.querySelectorAll('.result-item')];
+            const srcIdx = items.indexOf(dragSrc);
+            const tgtIdx = items.indexOf(item);
+            if (srcIdx > tgtIdx) parent.insertBefore(dragSrc, item);
+            else parent.insertBefore(dragSrc, item.nextSibling);
+          }
+        });
+        item.addEventListener('drop', (e) => { e.preventDefault(); });
+      });
     }
 
-    // === Main Update Function ===
+    function saveOrder() {
+      const order = [...document.querySelectorAll('.result-item')].map(el => el.id);
+      localStorage.setItem('eduSearchOrder', JSON.stringify(order));
+    }
+
+    function restoreOrder() {
+      const saved = JSON.parse(localStorage.getItem('eduSearchOrder') || 'null');
+      if (!saved) return;
+      const mainContainer = document.getElementById('main-results');
+      saved.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.parentNode === mainContainer) mainContainer.appendChild(el);
+      });
+    }
+
+    setupDragDrop();
+    restoreOrder();
+
+    // ── Tooltips ──
+    document.querySelectorAll('.result-title').forEach(link => {
+      const tooltip = link.querySelector('.tooltip');
+      if (!tooltip) return;
+      link.addEventListener('mouseenter', () => tooltip.classList.add('visible'));
+      link.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+    });
+
+    // ── Voice ──
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'uk-UA';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      let stopTimeout = null;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        input.value = transcript;
+        debouncedUpdate();
+        saveRecentQuery(transcript);
+        updateVoiceButton();
+      };
+      recognition.onerror = () => stopRecording();
+      recognition.onend = () => { if (stopTimeout) clearTimeout(stopTimeout); stopRecording(); };
+    }
+
+    function startVoiceInput() {
+      if (!recognition) { alert('Ваш браузер не підтримує голосове введення. Спробуйте Chrome або Edge.'); return; }
+      if (voiceBtn.classList.contains('recording')) { recognition.stop(); return; }
+      voiceBtn.textContent = '⏹';
+      voiceBtn.classList.add('recording');
+      recognition.start();
+      stopTimeout = setTimeout(() => recognition.stop(), 4000);
+    }
+
+    function stopRecording() {
+      voiceBtn.classList.remove('recording');
+      voiceBtn.textContent = '🎙️';
+    }
+
+    function updateVoiceButton() {
+      if (input.value.trim() === '') {
+        voiceBtn.textContent = '🎙️';
+        voiceBtn.title = 'Голосове введення';
+        voiceBtn.onclick = startVoiceInput;
+      } else {
+        voiceBtn.textContent = '❌';
+        voiceBtn.title = 'Очистити поле';
+        voiceBtn.onclick = () => {
+          input.value = '';
+          updateVoiceButton();
+          updateResultsNow();
+          input.focus();
+        };
+      }
+      if (voiceBtn.classList.contains('recording')) stopRecording();
+    }
+
+    // ── Google Search ──
+    function searchInGoogle() {
+      const query = input.value.trim();
+      const url = query ? `https://www.google.com/search?q=${encodeURIComponent(query)}` : 'https://www.google.com';
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    googleBtn.addEventListener('click', searchInGoogle);
+
+    // ── Main update ──
     function updateResultsNow() {
       const value = input.value.trim();
+
       if (!value) {
         header.classList.remove('hidden');
         searchWrapper.classList.remove('lifted');
         calculatorResult.classList.remove('visible');
-        for (const item of Object.values(mainItems)) item.classList.remove('visible');
-        for (const item of Object.values(videoItems)) item.classList.remove('visible');
-        videoSection.classList.remove('visible');
+        filterBar.classList.remove('visible');
+        shareBtn.classList.remove('visible');
+        allItems().forEach(el => el.classList.remove('visible'));
         return;
       }
 
       if (isMathExpression(value)) {
-        const result = safeEvaluate(value);
+        const result = safeMathEval(value);
         if (result !== null) {
           header.classList.add('hidden');
           searchWrapper.classList.add('lifted');
+          filterBar.classList.remove('visible');
+          shareBtn.classList.remove('visible');
 
           let displayText = `${value} = ${result}`;
           let averageLine = '';
-
           if (isOnlyAddition(value)) {
-            const numbers = extractNumbersFromAddition(value);
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            const avgRounded = avg % 1 === 0 ? avg : parseFloat(avg.toFixed(2));
-            averageLine = `<div class="average-hint">Середнє: ${avgRounded}</div>`;
+            const nums = value.trim().replace(/\s+/g,'').split('+').map(parseFloat);
+            const avg = nums.reduce((a,b)=>a+b,0) / nums.length;
+            averageLine = `<div class="average-hint">Середнє: ${avg % 1 === 0 ? avg : +avg.toFixed(2)}</div>`;
           }
 
           calculatorResult.innerHTML = displayText + averageLine;
           calculatorResult.classList.add('visible');
-
-          for (const item of Object.values(mainItems)) item.classList.remove('visible');
-          for (const item of Object.values(videoItems)) item.classList.remove('visible');
-          videoSection.classList.remove('visible');
+          allItems().forEach(el => el.classList.remove('visible'));
           return;
         }
       }
 
-      // Звичайний пошук
+      // Normal search
       header.classList.add('hidden');
       searchWrapper.classList.add('lifted');
       calculatorResult.classList.remove('visible');
+      filterBar.classList.add('visible');
+      shareBtn.classList.add('visible');
 
-      const platforms = [
-        { id: 'wordwall', elem: mainItems.wordwall },
-        { id: 'liveworksheets', elem: mainItems.liveworksheets },
-        { id: 'islcollectiveWorksheets', elem: mainItems.islcollectiveWorksheets },
-        { id: 'learningapps', elem: mainItems.learningapps },
-        { id: 'naurokPresentations', elem: mainItems.naurokPresentations },
-        { id: 'naurokTests', elem: mainItems.naurokTests },
-        { id: 'vseosvita', elem: mainItems.vseosvita },
-        { id: 'kahoot', elem: mainItems.kahoot },
-        { id: 'quizlet', elem: mainItems.quizlet },
-        { id: 'classtools', elem: mainItems.classtools },
-        { id: 'islcollectiveVideos', elem: videoItems.islcollectiveVideos },
-        { id: 'youtube', elem: videoItems.youtube }
-      ];
+      const titleMap = {
+        naurokPresentations: `"${value}" — презентації на «На Урок»`,
+        naurokTests:         `"${value}" — тести на «На Урок»`,
+        islcollectiveVideos: `"${value}" інтерактивні відео на ISL`,
+        youtube:             `"${value}" на YouTube`,
+        classtools:          `"${value}" на ClassTools.net`,
+        kahoot:              `"${value}" на Kahoot!`,
+        quizlet:             `"${value}" на Quizlet`,
+        enghub:              `"${value}" на Enghub`,
+        svitppt:             `"${value}" на Світ ППТ`,
+        classtime:           `"${value}" на Classtime`,
+        wizerme:             `"${value}" на Wizer.me`,
+      };
 
-      platforms.forEach(({ id, elem }) => {
-        const span = elem.querySelector('.result-title span');
-        const link = elem.querySelector('.result-title');
-        const url = buildPlatformUrl(id, value);
-        let titleText = `"${value}"`;
+      Object.keys(PLATFORMS).forEach(key => {
+        const el = getItem(key);
+        const span = el.querySelector('.result-title span');
+        const link = el.querySelector('.result-title');
+        const url = buildPlatformUrl(key, value);
 
-        if (id === 'naurokPresentations') titleText += ' — презентації на «На Урок»';
-        else if (id === 'naurokTests') titleText += ' — тести на «На Урок»';
-        else if (id === 'islcollectiveVideos') titleText += ' інтерактивні відео на ISL';
-        else if (id === 'youtube') titleText += ' на YouTube';
-        else if (id === 'classtools') titleText += ' на ClassTools.net';
-        else if (id === 'kahoot') titleText += ' на Kahoot!';
-        else if (id === 'quizlet') titleText += ' на Quizlet';
-        else titleText += ` на ${id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1').trim()}`;
-
-        span.textContent = titleText;
+        span.textContent = titleMap[key] || `"${value}" на ${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g,' $1').trim()}`;
         link.href = url;
-
         link.onclick = (e) => {
           e.preventDefault();
           window.open(url, '_blank', 'noopener,noreferrer');
@@ -1078,17 +1503,45 @@
         };
       });
 
-      for (const item of Object.values(mainItems)) item.classList.add('visible');
-      for (const item of Object.values(videoItems)) item.classList.add('visible');
-      videoSection.classList.add('visible');
+      applyFilter();
     }
 
-    const debouncedUpdate = debounce(updateResultsNow, 600);
+    const debouncedUpdate = debounce(updateResultsNow, 500);
 
-    // Initialize
-    loadRecents();
-    loadFavorites();
-    updateVoiceButton();
+    input.addEventListener('input', () => { updateVoiceButton(); debouncedUpdate(); });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const value = input.value.trim();
+        if (value && isMathExpression(value) && safeMathEval(value) !== null) {
+          updateResultsNow(); return;
+        }
+        searchInGoogle();
+      }
+    });
+
+    input.addEventListener('focus', () => {
+      if (JSON.parse(localStorage.getItem('eduSearchRecents') || '[]').length > 0)
+        recentSection.classList.add('visible');
+      updateVoiceButton();
+    });
+
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (!recentList.contains(document.activeElement))
+          recentSection.classList.remove('visible');
+      }, 200);
+      updateVoiceButton();
+    });
+
+    // ── Init ──
+    (function() {
+      const recents = JSON.parse(localStorage.getItem('eduSearchRecents') || '[]');
+      renderRecents(recents);
+      loadFavorites();
+      updateVoiceButton();
+    })();
   </script>
 </body>
 </html>
