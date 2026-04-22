@@ -235,79 +235,6 @@
     }
     .google-btn:hover { background: var(--accent-hover); border-color: var(--accent); }
 
-    /* ── Filter Tabs (Google Style) ── */
-    .filter-bar {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-      opacity: 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: opacity 0.3s ease, max-height 0.3s ease;
-      user-select: none;
-    }
-    .filter-bar.visible {
-      opacity: 1;
-      max-height: 50px;
-    }
-    .filter-tab {
-      padding: 10px 4px;
-      font-size: 14px;
-      color: var(--text-muted);
-      cursor: pointer;
-      position: relative;
-      transition: color 0.2s;
-      white-space: nowrap;
-    }
-    .filter-tab:hover {
-      color: var(--text);
-    }
-    .filter-tab.active {
-      color: var(--accent);
-      font-weight: 500;
-    }
-    .filter-tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; /* Накладання на нижній бордер */
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--accent);
-      border-radius: 3px 3px 0 0;
-    }
-
-    /* ── Share button ── */
-    .share-btn {
-      display: none;
-      margin-bottom: 12px;
-      margin-left: 8px;
-      padding: 8px 20px;
-      background: var(--bg-card);
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .share-btn:hover { background: var(--accent-light); transform: scale(1.03); }
-    .share-btn.visible { display: inline-flex; align-items: center; gap: 6px; }
-
-    .action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0;
-      align-items: center;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 4px;
-    }
-
     /* ── Recent / Favorites ── */
     .recent-section, .favorites-section {
       width: 100%;
@@ -321,6 +248,7 @@
     .recent-section.visible, .favorites-section.visible {
       opacity: 1;
       max-height: 220px;
+      margin-bottom: 8px;
     }
 
     .recent-title, .favorites-title {
@@ -365,6 +293,52 @@
     .recent-item:hover .delete-recent,
     .favorite-item:hover .delete-fav { opacity: 1; }
 
+    /* ── Filter Tabs ── */
+    .filter-bar {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+      user-select: none;
+    }
+    .filter-bar.visible {
+      opacity: 1;
+      max-height: 50px;
+    }
+    .filter-tab {
+      padding: 10px 4px;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .filter-tab:hover {
+      color: var(--text);
+    }
+    .filter-tab.active {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .filter-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px 3px 0 0;
+    }
+
     /* ── Calculator ── */
     .calculator-result {
       display: none;
@@ -403,11 +377,11 @@
     .result-item { display: none; }
     .result-item.visible {
       display: block;
-      animation: fadeInUp 0.3s ease forwards;
+      animation: fadeInUp 0.4s ease forwards;
     }
 
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -418,12 +392,19 @@
       border-radius: 12px;
       padding: 14px 16px;
       margin-bottom: 10px;
-      transition: box-shadow 0.2s, border-color 0.2s;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
       cursor: grab;
+      position: relative;
     }
     .result-item:hover { box-shadow: 0 4px 16px var(--shadow); border-color: var(--accent); }
     .result-item.dragging { opacity: 0.45; cursor: grabbing; }
     .result-item.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(30,111,240,0.25); }
+    
+    /* Specific styling for ChatGPT cards */
+    .chatgpt-card {
+      border-left: 4px solid #10a37f;
+    }
+    .chatgpt-card:hover { border-color: #10a37f; }
 
     .result-header {
       display: flex;
@@ -443,6 +424,7 @@
       flex: 1;
       position: relative;
     }
+    .chatgpt-card .result-title { color: #10a37f; }
     .result-title:hover { text-decoration: underline; }
 
     .favicon {
@@ -477,6 +459,7 @@
     [data-theme="dark"] .fav-btn.filled { background: #2a2200; }
 
     .result-url { font-size: 13px; color: var(--green); margin-bottom: 3px; }
+    .chatgpt-card .result-url { color: #0f8566; }
     .result-desc { font-size: 13px; color: var(--text-muted); }
 
     /* drag handle hint */
@@ -508,7 +491,36 @@
     [data-theme="dark"] .tooltip { background: #e8eaf0; color: #0f1117; }
     .tooltip.visible { opacity: 1; }
 
-    /* ── Favorites note modal ── */
+    /* ── Share button Action Row ── */
+    .action-row {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+    .share-btn {
+      display: none;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .share-btn:hover { 
+      background: var(--accent-light); 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(30, 111, 240, 0.15);
+    }
+    .share-btn.visible { display: inline-flex; align-items: center; gap: 8px; }
+
+    /* ── Modals (General) ── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -517,6 +529,7 @@
       z-index: 500;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(2px);
     }
     .modal-overlay.open { display: flex; }
 
@@ -530,20 +543,7 @@
     }
     .modal h3 { margin: 0 0 16px; font-size: 17px; color: var(--text); }
 
-    .modal input[type="text"] {
-      width: 100%;
-      padding: 10px 14px;
-      font-size: 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--text);
-      outline: none;
-      margin-bottom: 16px;
-    }
-    .modal input[type="text"]:focus { border-color: var(--accent); }
-
-    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
     .modal-btn {
       padding: 8px 18px;
       border-radius: 10px;
@@ -556,6 +556,49 @@
     .modal-btn.primary { background: var(--accent); color: #fff; }
     .modal-btn.secondary { background: var(--bg-section); color: var(--text-muted); }
     .modal-btn:hover { opacity: 0.85; }
+
+    /* Note Modal specific */
+    .modal input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+    .modal input[type="text"]:focus { border-color: var(--accent); }
+
+    /* Share Modal specific */
+    .share-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 40vh;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+    .share-options-list::-webkit-scrollbar { width: 6px; }
+    .share-options-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    
+    .share-option label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      user-select: none;
+    }
+    .share-option input[type="checkbox"] {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
 
     /* ── Toast ── */
     .toast {
@@ -621,20 +664,7 @@
                autocomplete="off" />
         <button class="voice-btn" id="voiceBtn" title="Голосове введення">🎙️</button>
       </div>
-      <button class="google-btn" id="googleBtn">Загуглити</button>
-    </div>
-
-    <div class="filter-bar" id="filterBar">
-      <span class="filter-tab active" data-filter="all">Усі</span>
-      <span class="filter-tab" data-filter="games">🎮 Ігри</span>
-      <span class="filter-tab" data-filter="worksheets">📄 Аркуші</span>
-      <span class="filter-tab" data-filter="tests">✅ Тести</span>
-      <span class="filter-tab" data-filter="presentations">📊 Презентації</span>
-      <span class="filter-tab" data-filter="video">🎬 Відео</span>
-    </div>
-
-    <div class="action-row" id="actionRow">
-      <button class="share-btn" id="shareBtn">🔗 Поділитися добіркою</button>
+      <button class="google-btn" id="googleBtn">Google</button>
     </div>
 
     <div class="recent-section" id="recent-section">
@@ -645,6 +675,15 @@
     <div class="favorites-section" id="favorites-section">
       <div class="favorites-title">Улюблене</div>
       <div class="favorites-list" id="favorites-list"></div>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <span class="filter-tab active" data-filter="all">Усі</span>
+      <span class="filter-tab" data-filter="games">🎮 Ігри</span>
+      <span class="filter-tab" data-filter="worksheets">📄 Аркуші</span>
+      <span class="filter-tab" data-filter="tests">✅ Тести</span>
+      <span class="filter-tab" data-filter="presentations">📊 Презентації</span>
+      <span class="filter-tab" data-filter="video">🎬 Відео</span>
     </div>
 
     <div class="calculator-result" id="calculatorResult"></div>
@@ -717,6 +756,23 @@
         <div class="result-url">classtools.net</div>
         <div class="result-desc">Генератори ігор, діаграм, таймлайнів</div>
       </div>
+      
+      <div class="result-item chatgpt-card" id="item-chatgpt-games" data-type="games" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=chatgpt.com" alt="">
+            <span></span>
+            <div class="tooltip">Згенерувати інтерактивну гру за допомогою AI</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="chatgptGames">☆</button>
+          </div>
+        </div>
+        <div class="result-url">chatgpt.com (Генерація ШІ)</div>
+        <div class="result-desc">Автоматично згенерувати ідею гри в ChatGPT</div>
+      </div>
 
       <div class="result-item" id="item-liveworksheets" data-type="worksheets" draggable="true">
         <div class="result-header">
@@ -785,6 +841,23 @@
         <div class="result-url">wizer.me</div>
         <div class="result-desc">Створення та пошук інтерактивних аркушів</div>
       </div>
+      
+      <div class="result-item chatgpt-card" id="item-chatgpt-worksheets" data-type="worksheets" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=chatgpt.com" alt="">
+            <span></span>
+            <div class="tooltip">Згенерувати аркуш за допомогою AI</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="chatgptWorksheets">☆</button>
+          </div>
+        </div>
+        <div class="result-url">chatgpt.com (Генерація ШІ)</div>
+        <div class="result-desc">Автоматично згенерувати робочий аркуш в ChatGPT</div>
+      </div>
 
       <div class="result-item" id="item-quizlet" data-type="tests" draggable="true">
         <div class="result-header">
@@ -835,6 +908,23 @@
         </div>
         <div class="result-url">classtime.com</div>
         <div class="result-desc">Інтерактивні сесії та тести для учнів</div>
+      </div>
+      
+      <div class="result-item chatgpt-card" id="item-chatgpt-tests" data-type="tests" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=chatgpt.com" alt="">
+            <span></span>
+            <div class="tooltip">Згенерувати тест за допомогою AI</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="chatgptTests">☆</button>
+          </div>
+        </div>
+        <div class="result-url">chatgpt.com (Генерація ШІ)</div>
+        <div class="result-desc">Автоматично згенерувати тест у ChatGPT</div>
       </div>
 
       <div class="result-item" id="item-naurok-presentations" data-type="presentations" draggable="true">
@@ -923,6 +1013,10 @@
       </div>
 
     </div>
+    
+    <div class="action-row" id="actionRow">
+      <button class="share-btn" id="shareBtn">🔗 Поділитися добіркою</button>
+    </div>
   </div>
 
   <div class="modal-overlay" id="noteModal">
@@ -932,6 +1026,18 @@
       <div class="modal-actions">
         <button class="modal-btn secondary" id="noteCancelBtn">Скасувати</button>
         <button class="modal-btn primary" id="noteSaveBtn">Зберегти ⭐</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal">
+      <h3>Що саме скопіювати?</h3>
+      <div class="share-options-list" id="shareOptions">
+        </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="shareCancelBtn">Скасувати</button>
+        <button class="modal-btn primary" id="shareCopyBtn">Скопіювати 📋</button>
       </div>
     </div>
   </div>
@@ -970,7 +1076,6 @@
     }
     (function initTheme() {
       const saved = localStorage.getItem('eduSearchTheme');
-      // За замовчуванням біла тема (якщо немає збереженого налаштування на темну)
       applyTheme(saved === 'dark');
     })();
     themeToggle.addEventListener('click', () => {
@@ -1006,8 +1111,14 @@
     const favoritesList = document.getElementById('favorites-list');
     const filterBar     = document.getElementById('filterBar');
     const shareBtn      = document.getElementById('shareBtn');
+    
+    // Modals
     const noteModal     = document.getElementById('noteModal');
     const noteInput     = document.getElementById('noteInput');
+    const shareModal    = document.getElementById('shareModal');
+    const shareOptions  = document.getElementById('shareOptions');
+    const shareCopyBtn  = document.getElementById('shareCopyBtn');
+    const shareCancelBtn = document.getElementById('shareCancelBtn');
 
     // ── Platform map ──
     const PLATFORMS = {
@@ -1015,22 +1126,56 @@
       kahoot:                  { id: 'item-kahoot',                  type: 'games' },
       learningapps:            { id: 'item-learningapps',            type: 'games' },
       classtools:              { id: 'item-classtools',              type: 'games' },
+      chatgptGames:            { id: 'item-chatgpt-games',           type: 'games' },
+      
       liveworksheets:          { id: 'item-liveworksheets',          type: 'worksheets' },
       islcollectiveWorksheets: { id: 'item-islcollective-worksheets',type: 'worksheets' },
       enghub:                  { id: 'item-enghub',                  type: 'worksheets' },
       wizerme:                 { id: 'item-wizerme',                 type: 'worksheets' },
+      chatgptWorksheets:       { id: 'item-chatgpt-worksheets',      type: 'worksheets' },
+      
       quizlet:                 { id: 'item-quizlet',                 type: 'tests' },
       naurokTests:             { id: 'item-naurok-tests',            type: 'tests' },
       classtime:               { id: 'item-classtime',               type: 'tests' },
+      chatgptTests:            { id: 'item-chatgpt-tests',           type: 'tests' },
+      
       naurokPresentations:     { id: 'item-naurok-presentations',    type: 'presentations' },
       vseosvita:               { id: 'item-vseosvita',               type: 'presentations' },
       svitppt:                 { id: 'item-svitppt',                 type: 'presentations' },
+      
       islcollectiveVideos:     { id: 'item-islcollective-videos',    type: 'video' },
-      youtube:                 { id: 'item-youtube',                 type: 'video' },
+      youtube:                 { id: 'item-youtube',                 type: 'video' }
     };
 
     function getItem(key) { return document.getElementById(PLATFORMS[key].id); }
     function allItems()   { return Object.keys(PLATFORMS).map(k => getItem(k)); }
+
+    // ── Cyrillic Check Helper ──
+    function isOnlyCyrillic(str) {
+      const hasCyrillic = /[а-яА-ЯіІїЇєЄґҐ]/i.test(str);
+      const hasLatin = /[a-zA-Z]/i.test(str);
+      return hasCyrillic && !hasLatin;
+    }
+
+    // ── Generates Prompt based on Language and Category ──
+    function getChatGPTPrompt(category, query) {
+      const isCyrillic = /[а-яА-ЯіІїЇєЄґҐ]/i.test(query);
+      if (isCyrillic) {
+        switch(category) {
+          case 'games': return `Створи ідею та механіку для інтерактивної навчальної гри для учнів за темою: "${query}"`;
+          case 'worksheets': return `Створи робочий аркуш (worksheet) із різноманітними завданнями для учнів за темою: "${query}"`;
+          case 'tests': return `Створи тест з варіантами відповідей (і вкажи правильні) за темою: "${query}"`;
+          default: return `Підготуй навчальні матеріали за темою: "${query}"`;
+        }
+      } else {
+        switch(category) {
+          case 'games': return `Create an idea and mechanics for an interactive educational game for students on the topic: "${query}"`;
+          case 'worksheets': return `Create a worksheet with various exercises for students on the topic: "${query}"`;
+          case 'tests': return `Create a multiple-choice test (and provide correct answers) on the topic: "${query}"`;
+          default: return `Prepare educational materials on the topic: "${query}"`;
+        }
+      }
+    }
 
     // ── Build URL ──
     function buildPlatformUrl(platformId, query) {
@@ -1057,7 +1202,7 @@
       }
     }
 
-    // ── Math (safe parser — no new Function) ──
+    // ── Math ──
     function safeMathEval(expr) {
       expr = expr.trim().replace(/\s+/g, '');
       try {
@@ -1124,10 +1269,29 @@
     function applyFilter() {
       const value = input.value.trim();
       if (!value) return;
+
+      const cyrillicOnly = isOnlyCyrillic(value);
+      const excludedKeys = ['enghub', 'kahoot', 'islcollectiveWorksheets', 'islcollectiveVideos'];
+
       Object.keys(PLATFORMS).forEach(key => {
         const el = getItem(key);
         const type = PLATFORMS[key].type;
-        if (activeFilter === 'all' || type === activeFilter) {
+        const isChatGPT = key.startsWith('chatgpt');
+
+        let isVisible = false;
+
+        if (activeFilter === 'all') {
+          isVisible = !isChatGPT;
+        } else {
+          isVisible = (type === activeFilter);
+        }
+
+        // Якщо запит тільки кирилицею, ховаємо специфічні платформи
+        if (cyrillicOnly && excludedKeys.includes(key)) {
+          isVisible = false;
+        }
+
+        if (isVisible) {
           el.classList.add('visible');
         } else {
           el.classList.remove('visible');
@@ -1135,25 +1299,100 @@
       });
     }
 
-    // ── Share ──
+    // ── Share Modal Logic ──
     shareBtn.addEventListener('click', () => {
       const value = input.value.trim();
       if (!value) return;
-      let lines = [`🔍 Пошук: "${value}"\n`];
+
+      shareOptions.innerHTML = '';
+      let hasVisible = false;
+
       Object.keys(PLATFORMS).forEach(key => {
         const el = getItem(key);
         if (el.classList.contains('visible')) {
-          const url = buildPlatformUrl(key, value);
-          const label = el.querySelector('.result-url').textContent;
-          if (url !== '#') lines.push(`• ${label}: ${url}`);
+          hasVisible = true;
+          
+          let url = '';
+          if (key.startsWith('chatgpt')) {
+            const promptText = getChatGPTPrompt(PLATFORMS[key].type, value);
+            url = `https://chatgpt.com/?q=${encodeURIComponent(promptText)}`;
+          } else {
+            url = buildPlatformUrl(key, value);
+          }
+
+          if (url !== '#') {
+            const labelText = el.querySelector('.result-url').textContent;
+            
+            const div = document.createElement('div');
+            div.className = 'share-option';
+            div.innerHTML = `
+              <label>
+                <input type="checkbox" value="${key}" checked>
+                ${labelText}
+              </label>
+            `;
+            shareOptions.appendChild(div);
+          }
         }
       });
+
+      if (hasVisible) {
+        shareModal.classList.add('open');
+      } else {
+        showToast('⚠️ Немає видимих результатів для поширення');
+      }
+    });
+
+    // Копіювання обраних посилань
+    shareCopyBtn.addEventListener('click', () => {
+      const value = input.value.trim();
+      const checkedInputs = shareOptions.querySelectorAll('input:checked');
+
+      if (checkedInputs.length === 0) {
+        showToast('⚠️ Виберіть хоча б один ресурс');
+        return;
+      }
+
+      let lines = [`🔍 Пошук: "${value}"\n`];
+      const selectedItems = [];
+
+      checkedInputs.forEach(checkbox => {
+        const key = checkbox.value;
+        const el = getItem(key);
+        
+        let url = '';
+        if (key.startsWith('chatgpt')) {
+          const promptText = getChatGPTPrompt(PLATFORMS[key].type, value);
+          url = `https://chatgpt.com/?q=${encodeURIComponent(promptText)}`;
+        } else {
+          url = buildPlatformUrl(key, value);
+        }
+        
+        const labelText = el.querySelector('.result-url').textContent;
+
+        lines.push(`• ${labelText}: ${url}`);
+        selectedItems.push(el);
+      });
+
+      // Каскадна анімація появи для обраних
+      selectedItems.forEach((el, index) => {
+        el.classList.remove('visible');
+        void el.offsetWidth; // Рефлоу
+        setTimeout(() => el.classList.add('visible'), index * 60);
+      });
+
       const text = lines.join('\n');
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => showToast('📋 Добірку скопійовано в буфер!'));
       } else {
         prompt('Скопіюйте добірку:', text);
       }
+      
+      shareModal.classList.remove('open');
+    });
+
+    shareCancelBtn.addEventListener('click', () => {
+      shareModal.classList.remove('open');
     });
 
     // ── Copy button per card ──
@@ -1236,7 +1475,15 @@
         el.title = `Відкрити "${fav.query}" на ${fav.platform}`;
         el.addEventListener('click', (e) => {
           if (e.target.classList.contains('delete-fav')) return;
-          const url = buildPlatformUrl(fav.platform, fav.query);
+          
+          let url = '';
+          if (fav.platform.startsWith('chatgpt')) {
+            const promptText = getChatGPTPrompt(PLATFORMS[fav.platform].type, fav.query);
+            url = `https://chatgpt.com/?q=${encodeURIComponent(promptText)}`;
+          } else {
+            url = buildPlatformUrl(fav.platform, fav.query);
+          }
+
           if (url !== '#') { window.open(url, '_blank', 'noopener,noreferrer'); saveRecentQuery(fav.query); }
         });
         favoritesList.appendChild(el);
@@ -1486,21 +1733,46 @@
         svitppt:             `"${value}" на Світ ППТ`,
         classtime:           `"${value}" на Classtime`,
         wizerme:             `"${value}" на Wizer.me`,
+        
+        chatgptGames:          `Згенерувати гру в ChatGPT`,
+        chatgptWorksheets:     `Згенерувати аркуші в ChatGPT`,
+        chatgptTests:          `Згенерувати тест в ChatGPT`
       };
 
       Object.keys(PLATFORMS).forEach(key => {
         const el = getItem(key);
         const span = el.querySelector('.result-title span');
         const link = el.querySelector('.result-title');
-        const url = buildPlatformUrl(key, value);
 
         span.textContent = titleMap[key] || `"${value}" на ${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g,' $1').trim()}`;
-        link.href = url;
-        link.onclick = (e) => {
-          e.preventDefault();
-          window.open(url, '_blank', 'noopener,noreferrer');
-          saveRecentQuery(value);
-        };
+        
+        if (key.startsWith('chatgpt')) {
+          const promptText = getChatGPTPrompt(PLATFORMS[key].type, value);
+          const url = `https://chatgpt.com/?q=${encodeURIComponent(promptText)}`;
+          link.href = url;
+          link.onclick = (e) => {
+            e.preventDefault();
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(promptText).then(() => {
+                showToast('📋 Промт скопійовано!');
+                setTimeout(() => window.open(url, '_blank', 'noopener,noreferrer'), 400);
+              }).catch(() => {
+                window.open(url, '_blank', 'noopener,noreferrer');
+              });
+            } else {
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }
+            saveRecentQuery(value);
+          };
+        } else {
+          const url = buildPlatformUrl(key, value);
+          link.href = url;
+          link.onclick = (e) => {
+            e.preventDefault();
+            window.open(url, '_blank', 'noopener,noreferrer');
+            saveRecentQuery(value);
+          };
+        }
       });
 
       applyFilter();
