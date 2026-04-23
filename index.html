@@ -841,6 +841,23 @@
         <div class="result-url">wizer.me</div>
         <div class="result-desc">Створення та пошук інтерактивних аркушів</div>
       </div>
+
+      <div class="result-item" id="item-genially" data-type="worksheets" draggable="true">
+        <div class="result-header">
+          <span class="drag-handle">⠿</span>
+          <a href="#" class="result-title" target="_blank" rel="noopener">
+            <img class="favicon" src="https://www.google.com/s2/favicons?domain=app.genially.com" alt="">
+            <span></span>
+            <div class="tooltip">Genially — інтерактивні матеріали</div>
+          </a>
+          <div class="card-actions">
+            <button class="copy-btn">📋 Копіювати</button>
+            <button class="fav-btn" data-id="genially">☆</button>
+          </div>
+        </div>
+        <div class="result-url">app.genially.com</div>
+        <div class="result-desc">Інтерактивні презентації, ігри та аркуші</div>
+      </div>
       
       <div class="result-item chatgpt-card" id="item-chatgpt-worksheets" data-type="worksheets" draggable="true">
         <div class="result-header">
@@ -1132,6 +1149,7 @@
       islcollectiveWorksheets: { id: 'item-islcollective-worksheets',type: 'worksheets' },
       enghub:                  { id: 'item-enghub',                  type: 'worksheets' },
       wizerme:                 { id: 'item-wizerme',                 type: 'worksheets' },
+      genially:                { id: 'item-genially',                type: 'worksheets' },
       chatgptWorksheets:       { id: 'item-chatgpt-worksheets',      type: 'worksheets' },
       
       quizlet:                 { id: 'item-quizlet',                 type: 'tests' },
@@ -1198,6 +1216,7 @@
         case 'svitppt':              return `https://svitppt.com.ua/search.html?text=${plus}`;
         case 'classtime':            return `https://www.classtime.com/curriculum/search/?query=${enc}`;
         case 'wizerme':              return `https://app.wizer.me/dashboard/community?q=${enc}`;
+        case 'genially':             return `https://app.genially.com/teams/656f74af0e618a00139d91a3/community/search?s=${plus}`;
         default: return '#';
       }
     }
@@ -1733,6 +1752,7 @@
         svitppt:             `"${value}" на Світ ППТ`,
         classtime:           `"${value}" на Classtime`,
         wizerme:             `"${value}" на Wizer.me`,
+        genially:            `"${value}" на Genially`,
         
         chatgptGames:          `Згенерувати гру в ChatGPT`,
         chatgptWorksheets:     `Згенерувати аркуші в ChatGPT`,
