@@ -1553,6 +1553,56 @@
       };
     }
 
+    // ── API Queue (serialize calls, respect rate limits) ──
+    const apiQueue = (function() {
+      const queue = [];
+      let busy = false;
+      const MIN_GAP = 400;
+
+      function next() {
+        if (busy || queue.length === 0) return;
+        busy = true;
+        const item = queue.shift();
+        const now = Date.now();
+        const wait = Math.max(0, MIN_GAP - (now - item.startTime));
+        if (wait > 0) {
+          setTimeout(() => run(item), wait);
+        } else {
+          run(item);
+        }
+      }
+
+      async function run(item) {
+        item.startTime = Date.now();
+        try {
+          await item.handler();
+        } catch (e) {
+          if (e.name !== 'AbortError') console.error('API queue error:', e);
+        }
+        item.startTime = Date.now();
+        busy = false;
+        // small micro-gap before next
+        setTimeout(next, 50);
+      }
+
+      return {
+        enqueue(type, handler) {
+          // Remove pending items of same type (superseded)
+          for (let i = queue.length - 1; i >= 0; i--) {
+            if (queue[i].type === type) queue.splice(i, 1);
+          }
+          const item = { type, handler, startTime: 0 };
+          queue.push(item);
+          if (!busy) next();
+        },
+        cancelAll(type) {
+          for (let i = queue.length - 1; i >= 0; i--) {
+            if (queue[i].type === type) queue.splice(i, 1);
+          }
+        }
+      };
+    })();
+
     // ── Toast ──
     function showToast(msg, duration = 2200) {
       const toast = document.getElementById('toast');
@@ -2533,6 +2583,7 @@ Rules:
 
     function closeAiGen() {
       if (aiGenAbort) { aiGenAbort.abort(); aiGenAbort = null; }
+      apiQueue.cancelAll('generate');
       aiGenModal.classList.remove('open');
       aiGenStopBtn.style.display = 'none';
       aiGenFrame.style.display = 'none';
@@ -2575,6 +2626,10 @@ Rules:
       aiGenStopBtn.style.display = 'inline-flex';
       aiGenModal.classList.add('open');
 
+      // Enqueue the actual API call so all AI requests are serialized
+      const genSignal = aiGenAbort?.signal;
+      apiQueue.enqueue('generate', async () => {
+        if (genSignal?.aborted) return;
       try {
         if (isGame) {
           // ── Non-streaming: get JSON data only, use built-in templates ──
@@ -2622,7 +2677,7 @@ Rules:
           let gameData = null;
           for (let attempt = 0; attempt < 3; attempt++) {
             try {
-              const raw = await fetchGameJson(aiGenAbort.signal);
+              const raw = await fetchGameJson(genSignal);
               gameData = extractJson(raw);
               break;
             } catch(e) {
@@ -2647,7 +2702,7 @@ Rules:
           // ── Streaming: text materials ──
           const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            signal: aiGenAbort.signal,
+            signal: genSignal,
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getGroqApiKey()}` },
             body: JSON.stringify({
               model: 'llama-3.3-70b-versatile',
@@ -2706,6 +2761,7 @@ Rules:
         aiGenStopBtn.style.display = 'none';
         aiGenAbort = null;
       }
+      });
     }
 
     aiGenCopyBtn.addEventListener('click', () => {
@@ -2829,13 +2885,12 @@ Rules:
     }
 
     async function fetchSuggestions(query) {
-      console.log('fetchSuggestions called:', query);
       if (!query || query.length < 3) { hideSuggestions(); return; }
-      if (query === lastSuggestedQuery) { console.log('dedup, skip'); return; }
+      if (query === lastSuggestedQuery) return;
       lastSuggestedQuery = query;
 
       if (suggestionsAbort) suggestionsAbort.abort();
-      suggestionsAbort = new AbortController();
+      const currentSignal = (suggestionsAbort = new AbortController()).signal;
 
       showLoadingChips();
 
@@ -2844,35 +2899,40 @@ Rules:
         ? `Ти асистент для вчителя. Дай рівно 5 споріднених навчальних тем для запиту. Відповідай ТІЛЬКИ JSON масивом рядків. Без пояснень. Приклад: ["тема1","тема2","тема3","тема4","тема5"]`
         : `You are a teaching assistant. Give exactly 5 related English language learning topics for the given query. Reply ONLY with a JSON array of strings. No explanations. Example: ["topic1","topic2","topic3","topic4","topic5"]`;
 
-      try {
-        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          signal: suggestionsAbort.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getGroqApiKey()}`
-          },
-          body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
-            max_tokens: 120,
-            temperature: 0.7,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user',   content: query }
-            ]
-          })
-        });
+      apiQueue.enqueue('suggestions', async () => {
+        if (currentSignal.aborted) return;
+        try {
+          const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            signal: currentSignal,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${getGroqApiKey()}`
+            },
+            body: JSON.stringify({
+              model: 'llama-3.1-8b-instant',
+              max_tokens: 120,
+              temperature: 0.7,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user',   content: query }
+              ]
+            })
+          });
 
-        if (!resp.ok) { if (resp.status === 429) showRateLimitModal(); hideSuggestions(); return; }
-        const data = await resp.json();
-        const text = data.choices?.[0]?.message?.content || '';
-        const clean = text.replace(/```json|```/g, '').trim();
-        const chips = JSON.parse(clean);
-        if (Array.isArray(chips)) renderSuggestionChips(chips.slice(0, 5));
-        else hideSuggestions();
-      } catch (e) {
-        if (e.name !== 'AbortError') hideSuggestions();
-      }
+          if (currentSignal.aborted) return;
+          if (!resp.ok) { if (resp.status === 429) showRateLimitModal(); hideSuggestions(); return; }
+          const data = await resp.json();
+          if (currentSignal.aborted) return;
+          const text = data.choices?.[0]?.message?.content || '';
+          const clean = text.replace(/```json|```/g, '').trim();
+          const chips = JSON.parse(clean);
+          if (Array.isArray(chips)) renderSuggestionChips(chips.slice(0, 5));
+          else hideSuggestions();
+        } catch (e) {
+          if (e.name !== 'AbortError') hideSuggestions();
+        }
+      });
     }
 
     const debouncedSuggestions = debounce(q => fetchSuggestions(q), 800);
